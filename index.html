@@ -2,12 +2,8 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#080809">
-<title>CTRL.ai</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTRL — AI Command Center</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
@@ -16,58 +12,88 @@
   --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
   --text:#e2e0ec; --text2:#8a8898; --text3:#5a5868;
   --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
-  --dev:#60b8f0; --research:#f06080; --ops:#f0a840; --accent:#c8f060;
+  --dev:#60b8f0; --research:#f06080; --ops:#f0a840; --music:#c8f060;
 }
+/* LIGHT THEME */
 body.light {
   --bg:#f4f5f7; --bg2:#ffffff; --bg3:#eef0f3; --bg4:#e4e6ea; --bg5:#dcdfe4;
   --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
   --text:#1a1a24; --text2:#4a4a5a; --text3:#8a8a9a;
 }
+body.light .topbar { box-shadow: 0 1px 0 var(--border); }
+body.light .bubble.from-agent { background:var(--bg2); }
+body.light .bubble.from-user { background:var(--bg4); }
+body.light .master-banner { background:linear-gradient(90deg,rgba(80,150,30,.06),rgba(80,150,30,.02)); border-bottom-color:rgba(80,150,30,.2); }
+body.light .master-banner::after { background:linear-gradient(to bottom,#6aaa00,rgba(80,150,30,.3)); }
+body.light .mcb-name { color:#4a8c00; }
+body.light .master-info-name { color:#4a8c00; }
+body.light .master-crown-tag { background:rgba(80,150,30,.1); color:#4a8c00; }
+body.light .master-sidebar-item { background:linear-gradient(90deg,rgba(80,150,30,.04),transparent); }
+body.light .master-sidebar-item.active { background:linear-gradient(90deg,rgba(80,150,30,.1),rgba(80,150,30,.02)); }
+body.light .master-avatar { background:linear-gradient(135deg,rgba(80,150,30,.15),rgba(80,150,30,.05)); border-color:rgba(80,150,30,.3); }
+body.light .task-card { box-shadow:0 1px 3px rgba(0,0,0,.06); }
+body.light .task-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.1); }
+body.light .thinking-stream { background:var(--bg3); }
+body.light .canvas-panel::before { background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px); }
+body.light .cn-master { background:linear-gradient(135deg,rgba(80,150,30,.08),rgba(80,150,30,.03)); border-color:rgba(80,150,30,.35); }
+body.light .progress-bar { background:var(--bg5); }
+body.light .card-thought { background:rgba(0,0,0,.04); }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:44px;border-bottom:1px solid var(--border);flex-shrink:0;z-index:200;}
-.logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.15em;color:var(--accent);}
+.logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.15em;color:var(--music);}
 .logo span{color:var(--text3);font-weight:300;}
 .nav-tabs{display:flex;gap:2px;margin-left:16px;}
 .nav-tab{font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:5px 12px;border-radius:4px;cursor:pointer;color:var(--text3);border:none;background:none;transition:all .15s;}
 .nav-tab:hover{color:var(--text2);background:var(--bg3);}
-.nav-tab.active{color:var(--accent);background:rgba(200,240,96,.08);}
+.nav-tab.active{color:var(--music);background:rgba(200,240,96,.08);}
 .topbar-right{display:flex;align-items:center;gap:10px;}
-.api-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .15s;}
-.api-status:hover{border-color:var(--border2);}
-.api-status.ok{color:var(--accent);border-color:rgba(200,240,96,.2);}
-.api-status.err{color:var(--research);border-color:rgba(240,96,128,.2);}
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 2s infinite;flex-shrink:0;}
-.pulse.err{background:var(--research);box-shadow:0 0 8px var(--research);}
+.status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:20px;}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--music);box-shadow:0 0 8px var(--music);animation:blink 2s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.settings-btn{width:32px;height:32px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;font-size:15px;}
+.settings-btn:hover{color:var(--text2);border-color:var(--border2);background:var(--bg3);}
+.settings-btn.active{color:var(--music);border-color:rgba(200,240,96,.3);background:rgba(200,240,96,.08);}
 
-/* ── PAGES ── */
+/* ── PAGE LAYOUT ── */
 .page{display:none;flex:1;overflow:hidden;}
 .page.active{display:flex;}
 
-/* ── SIDEBAR LAYOUT ── */
-.sidebar-layout{display:grid;grid-template-columns:240px 1fr;flex:1;overflow:hidden;}
+/* CHAT + TASKS share sidebar layout */
+.sidebar-layout{display:grid;grid-template-columns:240px 1fr 280px;flex:1;overflow:hidden;}
+/* TEAMS: full width, no sidebar */
+.teams-page{flex:1;display:none;overflow:hidden;}
+.teams-page.active{display:grid;grid-template-columns:1fr 300px;}
+/* SETTINGS: full width */
+.settings-page{flex:1;display:none;overflow-y:auto;}
+.settings-page.active{display:block;}
 
-/* ── LEFT SIDEBAR ── */
+/* ════════════════════════
+   SHARED LEFT SIDEBAR
+════════════════════════ */
 .agent-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.sidebar-top{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.sidebar-search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;}
+.sidebar-top{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center;}
+.sidebar-search{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;transition:border-color .15s;}
+.sidebar-search:focus{border-color:var(--border2);}
 .sidebar-search::placeholder{color:var(--text3);}
+.add-btn-top{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:rgba(200,240,96,.08);border:1px solid rgba(200,240,96,.2);color:var(--music);font-size:18px;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.add-btn-top:hover{background:rgba(200,240,96,.15);}
 .agents-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
 .master-sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 16px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border);position:relative;background:linear-gradient(90deg,rgba(200,240,96,.03),transparent);}
 .master-sidebar-item:hover{background:linear-gradient(90deg,rgba(200,240,96,.07),transparent);}
 .master-sidebar-item.active{background:linear-gradient(90deg,rgba(200,240,96,.1),rgba(200,240,96,.02));}
-.master-crown-tag{position:absolute;top:0;left:0;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--accent);background:rgba(200,240,96,.1);padding:2px 7px;border-radius:0 0 5px 0;}
+.master-crown-tag{position:absolute;top:0;left:0;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--music);background:rgba(200,240,96,.1);padding:2px 7px;border-radius:0 0 5px 0;}
 .master-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(200,240,96,.2),rgba(200,240,96,.08));border:1px solid rgba(200,240,96,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;}
 .av-status{position:absolute;bottom:-2px;right:-2px;width:9px;height:9px;border-radius:50%;border:2px solid var(--bg);}
 .master-info{flex:1;min-width:0;margin-top:6px;}
-.master-info-name{font-size:13px;font-weight:600;color:var(--accent);}
+.master-info-name{font-size:13px;font-weight:600;color:var(--music);}
 .master-info-sub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;}
 .team-header{display:flex;align-items:center;gap:8px;padding:10px 16px 6px;position:sticky;top:0;z-index:2;background:var(--bg);}
 .team-stripe{width:3px;height:14px;border-radius:2px;flex-shrink:0;}
 .team-label{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;}
+.team-badge{font-family:var(--mono);font-size:9px;margin-left:auto;padding:2px 6px;border-radius:3px;}
 .agent-row{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .12s;border-left:2px solid transparent;position:relative;}
 .agent-row:hover{background:var(--bg3);}
 .agent-row.active{background:var(--bg3);}
@@ -75,33 +101,74 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .agent-info{flex:1;min-width:0;}
 .agent-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
 .agent-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.agent-model-tag{font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;background:var(--bg4);color:var(--text3);}
+.agent-model-tag{font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;background:var(--bg4);color:var(--text3);white-space:nowrap;}
 .agent-task-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.unread-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
-/* ── MAIN CHAT ── */
+/* ════════════════════════
+   MAIN CONTENT AREA
+════════════════════════ */
 .main-content{display:flex;flex-direction:column;overflow:hidden;}
 .tab-pane{display:none;flex:1;flex-direction:column;overflow:hidden;}
 .tab-pane.active{display:flex;}
 
-/* chat header */
+/* ── CHAT ── */
+.master-banner{background:linear-gradient(90deg,rgba(200,240,96,.06),rgba(200,240,96,.02));border-bottom:1px solid rgba(200,240,96,.15);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;cursor:pointer;transition:background .15s;position:relative;overflow:hidden;}
+.master-banner:hover{background:linear-gradient(90deg,rgba(200,240,96,.1),rgba(200,240,96,.03));}
+.master-banner::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--music),rgba(200,240,96,.3));}
+.master-banner-label{position:absolute;top:3px;right:12px;font-family:var(--mono);font-size:8px;color:rgba(200,240,96,.4);letter-spacing:.12em;}
+.mcb-av{width:32px;height:32px;border-radius:8px;background:rgba(200,240,96,.12);border:1px solid rgba(200,240,96,.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.mcb-info{flex:1;}
+.mcb-name{font-size:12px;font-weight:600;color:var(--music);margin-bottom:1px;}
+.mcb-task{font-size:11px;color:var(--text3);}
+.mcb-model{font-family:var(--mono);font-size:9px;color:var(--music);background:rgba(200,240,96,.1);border:1px solid rgba(200,240,96,.2);padding:3px 8px;border-radius:4px;white-space:nowrap;}
+
 .chat-header{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .chat-header-av{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;}
 .chat-header-info{flex:1;}
 .chat-header-name{font-size:13px;font-weight:600;margin-bottom:2px;}
 .chat-header-meta{font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;align-items:center;gap:8px;}
 .chat-dot{width:6px;height:6px;border-radius:50%;}
+
+/* CHAT FILTERS BAR */
+.chat-filters-bar{display:flex;align-items:center;gap:6px;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg);}
+.cf-btn{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);cursor:pointer;color:var(--text3);background:none;transition:all .15s;white-space:nowrap;}
+.cf-btn:hover{color:var(--text2);border-color:var(--border2);}
+.cf-btn.active{background:rgba(200,240,96,.08);border-color:rgba(200,240,96,.25);color:var(--music);}
+.cf-icon{font-size:12px;}
+.cf-count{font-size:9px;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--text3);}
+
+/* LIBRARY VIEW */
+.library-view{flex:1;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;display:none;}
+.library-view.active{display:block;}
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:4px;}
+.lib-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s;}
+.lib-item:hover{border-color:var(--border2);transform:translateY(-1px);}
+.lib-thumb{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--bg4);}
+.lib-info{padding:8px;font-size:11px;color:var(--text2);}
+.lib-info-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+.lib-info-meta{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.lib-list-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:6px;}
+.lib-list-item:hover{border-color:var(--border2);}
+.lib-list-icon{font-size:18px;flex-shrink:0;}
+.lib-list-info{flex:1;min-width:0;}
+.lib-list-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lib-list-meta{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.lib-list-agent{font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0;}
+
+/* model switcher */
 .model-sw{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;cursor:pointer;transition:all .15s;position:relative;}
 .model-sw:hover{background:var(--bg4);}
 .model-sw-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;}
 .model-sw-name{font-family:var(--mono);font-size:11px;color:var(--text);}
-.model-dd{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px;min-width:220px;z-index:300;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.model-dd{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px;min-width:210px;z-index:300;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);}
 .model-dd.open{display:block;}
 .model-opt{padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s;}
 .model-opt:hover{background:var(--bg4);}
 .model-opt.selected{background:rgba(200,240,96,.06);}
 .model-opt-name{font-family:var(--mono);font-size:11px;color:var(--text);margin-bottom:2px;}
 .model-opt-desc{font-size:10px;color:var(--text3);}
-.model-chk{float:right;color:var(--accent);font-size:11px;}
+.model-chk{float:right;color:var(--music);font-size:11px;}
 
 /* chat messages */
 .chat-messages{flex:1;overflow-y:auto;padding:16px 20px 10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
@@ -116,18 +183,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .msg-av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;flex-shrink:0;}
 .msg-sender{font-family:var(--mono);font-size:10px;color:var(--text3);}
 .msg-time{font-family:var(--mono);font-size:9px;color:var(--text3);}
-.bubble{max-width:78%;padding:9px 13px;border-radius:14px;line-height:1.65;font-size:13px;}
+.bubble{max-width:72%;padding:9px 13px;border-radius:14px;line-height:1.6;font-size:13px;}
 .bubble.from-agent{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);}
 .bubble.from-user{background:var(--bg4);border:1px solid var(--border2);border-bottom-right-radius:4px;color:var(--text);}
 .bubble code{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;}
 .bubble pre{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;margin-top:8px;font-family:var(--mono);font-size:11px;overflow-x:auto;color:var(--text2);white-space:pre-wrap;}
-.streaming-cursor::after{content:'▋';animation:blink .8s infinite;color:var(--accent);}
 .typing-bub{background:var(--bg3);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:4px;padding:10px 14px;display:flex;gap:4px;align-items:center;}
 .t-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tdot 1.3s infinite;}
 .t-dot:nth-child(2){animation-delay:.15s}.t-dot:nth-child(3){animation-delay:.3s}
 @keyframes tdot{0%,60%,100%{transform:translateY(0);background:var(--text3)}30%{transform:translateY(-5px)}}
-
-/* chat input */
 .chat-input-wrap{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;}
 .chat-input-row{display:flex;gap:8px;align-items:flex-end;}
 .chat-ta{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:13px;resize:none;outline:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color .15s;}
@@ -135,232 +199,230 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .chat-ta::placeholder{color:var(--text3);}
 .send-btn{width:42px;height:42px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
 .send-btn:hover{filter:brightness(1.15);transform:scale(1.04);}
-.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 .send-btn svg{width:16px;height:16px;}
 
-/* system note */
-.system-note{background:rgba(200,240,96,.04);border:1px solid rgba(200,240,96,.12);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:10px;color:rgba(200,240,96,.6);text-align:center;margin:4px 0;}
-
-/* ── TASKS PAGE ── */
-.tasks-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.kanban-wrap{flex:1;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;}
-.kanban-col{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;}
-.kanban-col:last-child{border-right:none;}
-.col-top-stripe{height:2px;flex-shrink:0;}
-.col-header-inner{padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.col-header-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.col-title{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);}
-.col-count{font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto;}
-.col-desc{font-size:11px;color:var(--text3);}
-.col-body{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
-
-/* task cards */
-.task-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;}
+/* ── TASKS ── */
+.kanban-wrap{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.kanban-board{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;overflow-x:auto;overflow-y:hidden;}
+.kanban-col{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.col-header{display:flex;align-items:center;justify-content:space-between;padding:6px 4px;}
+.col-name{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);}
+.col-count{font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.col-cards{flex:1;display:flex;flex-direction:column;gap:6px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.task-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:grab;transition:all .15s;}
 .task-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3);}
-.card-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
-.card-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;flex:1;}
-.card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.card-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;}
-.tag-dev{background:rgba(96,184,240,.1);color:var(--dev)}.tag-research{background:rgba(240,96,128,.1);color:var(--research)}.tag-ops{background:rgba(240,168,64,.1);color:var(--ops)}.tag-master{background:rgba(200,240,96,.1);color:var(--accent)}
-.card-time{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;}
-.card-progress{margin-top:8px;}
-.progress-bar-wrap{height:3px;background:var(--bg5);border-radius:2px;overflow:hidden;}
-.progress-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .5s;}
-.card-result{margin-top:8px;font-size:11px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border);padding-top:8px;}
-.card-actions{display:flex;gap:6px;margin-top:8px;}
-.card-btn{font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);cursor:pointer;color:var(--text3);background:none;transition:all .15s;}
-.card-btn:hover{color:var(--text);border-color:var(--border2);}
-.card-btn.primary{background:var(--accent);color:#080809;border-color:var(--accent);}
-.card-btn.primary:hover{background:#d8ff70;}
+.task-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:6px;line-height:1.4;}
+.task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.task-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;}
+.tag-dev{background:rgba(96,184,240,.1);color:var(--dev)}.tag-research{background:rgba(240,96,128,.1);color:var(--research)}.tag-ops{background:rgba(240,168,64,.1);color:var(--ops)}.tag-music{background:rgba(200,240,96,.1);color:var(--music)}
+.task-agent{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;}
+.fab{position:absolute;bottom:20px;right:20px;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:20px;padding:8px 18px;cursor:pointer;box-shadow:0 4px 20px rgba(200,240,96,.25);transition:all .15s;}
+.fab:hover{background:#d8ff70;transform:translateY(-1px);}
 
-/* gist sync indicator */
-.sync-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--text3);}
-.sync-badge.syncing{color:var(--ops);}
-.sync-badge.synced{color:var(--accent);}
-.sync-badge.error{color:var(--research);}
+/* ════════════════════════
+   TEAMS PAGE — full width canvas
+════════════════════════ */
+.canvas-panel{flex:1;overflow:hidden;position:relative;background:var(--bg);cursor:grab;}
+.canvas-panel:active{cursor:grabbing;}
 
-/* ── SETTINGS PAGE ── */
-.settings-page{flex:1;overflow-y:auto;display:none;}
-.settings-page.active{display:block;}
-.settings-container{max-width:680px;margin:0 auto;padding:32px 24px;}
+/* grid bg */
+.canvas-panel::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+
+.canvas-world{position:absolute;transform-origin:0 0;will-change:transform;}
+
+/* canvas toolbar */
+.canvas-toolbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:50;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px 10px;}
+.ct-btn{font-family:var(--mono);font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:5px;transition:all .15s;white-space:nowrap;}
+.ct-btn:hover{color:var(--text2);background:var(--bg4);}
+.ct-sep{width:1px;background:var(--border2);margin:2px 2px;}
+.ct-zoom{font-family:var(--mono);font-size:10px;color:var(--text3);padding:4px 8px;}
+
+/* zoom controls */
+.zoom-controls{position:absolute;bottom:16px;left:16px;display:flex;flex-direction:column;gap:4px;z-index:50;}
+.zc-btn{width:30px;height:30px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.zc-btn:hover{background:var(--bg4);color:var(--text);}
+
+/* NODES ON CANVAS */
+.cn-master{position:absolute;width:220px;background:linear-gradient(135deg,rgba(200,240,96,.1),rgba(200,240,96,.04));border:1px solid rgba(200,240,96,.4);border-radius:14px;padding:14px 16px;cursor:pointer;transition:box-shadow .2s;user-select:none;}
+.cn-master:hover{box-shadow:0 0 40px rgba(200,240,96,.12);}
+.cn-master.node-selected{border-color:rgba(200,240,96,.8);box-shadow:0 0 50px rgba(200,240,96,.2);}
+.cn-crown{font-family:var(--mono);font-size:8px;letter-spacing:.15em;color:var(--music);background:rgba(200,240,96,.1);border:1px solid rgba(200,240,96,.25);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px;}
+.cn-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.cn-icon{width:34px;height:34px;border-radius:8px;background:rgba(200,240,96,.12);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.cn-name{font-size:13px;font-weight:600;}
+.cn-model{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.cn-status{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.cn-task-row{font-size:11px;color:var(--text2);line-height:1.5;padding-top:8px;border-top:1px solid var(--border);}
+.cn-task-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px;}
+
+.cn-team{position:absolute;width:160px;border-radius:10px;padding:10px 12px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);user-select:none;transition:all .2s;}
+.cn-team:hover{border-color:var(--border2);}
+.cn-team.node-selected{border-color:var(--border2);background:var(--bg4);}
+.cn-team-header{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.cn-team-icon{font-size:13px;}
+.cn-team-name{font-size:11px;font-weight:600;}
+.cn-team-count{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;}
+.cn-team-status{font-family:var(--mono);font-size:9px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+
+.cn-agent{position:absolute;width:148px;border-radius:9px;padding:9px 11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);user-select:none;transition:all .15s;}
+.cn-agent:hover{background:var(--bg3);border-color:var(--border2);}
+.cn-agent.node-selected{border-color:var(--dev);}
+.cn-agent-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.cn-agent-av{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;}
+.cn-agent-name{font-size:11px;font-weight:500;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cn-agent-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cn-agent-badge{position:absolute;top:6px;right:7px;font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;}
+.sb-run{background:rgba(200,240,96,.1);color:var(--music)}.sb-idle{background:rgba(90,88,104,.2);color:var(--text3)}.sb-wait{background:rgba(240,168,64,.1);color:var(--ops)}
+.cn-agent-task{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cn-agent-from{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;}
+
+/* SVG connectors */
+.canvas-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+
+/* + ADD button on canvas */
+.cn-add-btn{position:absolute;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text3);cursor:pointer;transition:all .2s;z-index:10;}
+.cn-add-btn:hover{background:var(--bg4);border-color:var(--text2);color:var(--text);}
+
+/* ADD AGENT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:24px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.modal-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;}
+.modal-input{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;margin-bottom:14px;transition:border-color .15s;}
+.modal-input:focus{border-color:rgba(200,240,96,.3);}
+.modal-options{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+.modal-opt{padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;text-align:center;}
+.modal-opt:hover{border-color:var(--border2);background:var(--bg4);}
+.modal-opt.selected{border-color:rgba(200,240,96,.4);background:rgba(200,240,96,.06);}
+.modal-opt-icon{font-size:18px;margin-bottom:4px;}
+.modal-opt-name{font-size:11px;font-weight:500;color:var(--text);}
+.modal-opt-desc{font-size:10px;color:var(--text3);}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.modal-cancel{background:none;border:1px solid var(--border2);color:var(--text3);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px;transition:all .15s;}
+.modal-cancel:hover{color:var(--text2);}
+.modal-confirm{background:var(--music);color:#080809;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600;transition:all .15s;}
+.modal-confirm:hover{background:#d8ff70;}
+
+/* teams detail panel */
+.teams-detail{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;width:300px;}
+.td-agent-card{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.td-empty{text-align:center;padding:20px 16px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;line-height:1.8;}
+.td-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.td-av{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;}
+.td-name{font-size:13px;font-weight:600;}
+.td-role{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.td-badge{margin-left:auto;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid;}
+.td-rows{display:flex;flex-direction:column;gap:7px;}
+.td-row{display:flex;gap:8px;}
+.td-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;width:50px;flex-shrink:0;padding-top:1px;}
+.td-val{font-size:11px;color:var(--text2);line-height:1.5;}
+.td-log-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.td-log-title{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);}
+.td-log-clear{font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.td-log-clear:hover{color:var(--text2);border-color:var(--border2);}
+.td-log-filters{display:flex;gap:3px;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.lf-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;color:var(--text3);background:none;transition:all .12s;}
+.lf-btn:hover{color:var(--text2);}
+.lf-btn.active{background:var(--bg3);border-color:var(--border2);color:var(--text);}
+.td-log-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.log-entry{padding:9px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;transition:background .1s;}
+.log-entry:hover{background:var(--bg3);}
+.log-time{font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0;padding-top:1px;width:38px;}
+.log-icon{font-size:11px;flex-shrink:0;padding-top:1px;}
+.log-body{flex:1;min-width:0;}
+.log-agent{font-family:var(--mono);font-size:9px;letter-spacing:.08em;margin-bottom:2px;}
+.log-msg{font-size:11px;color:var(--text2);line-height:1.45;}
+.log-tag{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;}
+.lt-task{background:rgba(96,184,240,.1);color:var(--dev)}.lt-done{background:rgba(200,240,96,.1);color:var(--music)}.lt-error{background:rgba(240,96,128,.1);color:var(--research)}.lt-info{background:rgba(90,88,104,.15);color:var(--text3)}
+
+/* ── RIGHT PANEL (chat/tasks) ── */
+.right-panel{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.rp-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;}
+.stat-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text);line-height:1;margin-bottom:3px;}
+.stat-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;}
+.stat-box.hi .stat-val{color:var(--music);}
+.rp-hdr{padding:12px 16px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rp-hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.rp-title{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);}
+.live-badge{font-family:var(--mono);font-size:9px;color:var(--music);background:rgba(200,240,96,.08);border:1px solid rgba(200,240,96,.2);padding:2px 8px;border-radius:10px;display:flex;align-items:center;gap:4px;}
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;}
+.l-item{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;}
+.l-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.l-text{font-family:var(--mono);font-size:8.5px;color:var(--text3);line-height:1.3;}
+.l-text b{color:var(--text2);display:block;}
+.team-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.team-pill{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:4px;font-family:var(--mono);font-size:9px;border:1px solid;}
+.rp-filters{display:flex;gap:3px;padding:8px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rf-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;color:var(--text3);background:none;transition:all .12s;}
+.rf-btn:hover{color:var(--text2);}
+.rf-btn.active{background:var(--bg3);border-color:var(--border2);color:var(--text);}
+.rp-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.rp-item{padding:10px 16px 10px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.rp-item:hover{background:var(--bg3);}
+.rp-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:5px;}
+.rp-item-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;}
+.rp-item-time{font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0;}
+.rp-item-footer{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.rp-chip{display:flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;border:1px solid;font-family:var(--mono);font-size:9px;}
+.rp-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;margin-left:auto;}
+
+/* ════════════════════════
+   SETTINGS PAGE
+════════════════════════ */
+.settings-container{max-width:700px;margin:0 auto;padding:32px 24px;}
 .settings-title{font-size:22px;font-weight:600;margin-bottom:4px;}
 .settings-sub{font-size:13px;color:var(--text3);margin-bottom:32px;}
 .settings-section{margin-bottom:28px;}
 .settings-section-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-.settings-row{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:20px;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
 .settings-row:last-child{border-bottom:none;}
-.settings-row-info{flex:1;}
+.settings-row-info{flex:1;margin-right:20px;}
 .settings-row-label{font-size:13px;font-weight:500;margin-bottom:3px;}
 .settings-row-desc{font-size:11px;color:var(--text3);}
-.settings-input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;width:280px;transition:border-color .15s;}
-.settings-input:focus{border-color:rgba(200,240,96,.3);}
-.settings-input::placeholder{color:var(--text3);}
-.settings-input.full{width:100%;margin-top:8px;}
-.settings-btn{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--accent);color:#080809;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.settings-btn:hover{background:#d8ff70;}
-.settings-btn.secondary{background:none;color:var(--text2);border:1px solid var(--border2);}
-.settings-btn.secondary:hover{background:var(--bg3);}
-.toggle{width:40px;height:22px;border-radius:11px;background:var(--bg4);border:1px solid var(--border2);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0;margin-top:2px;}
-.toggle.on{background:var(--accent);}
+/* toggle */
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--bg4);border:1px solid var(--border2);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.toggle.on{background:var(--music);}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text3);transition:all .2s;}
 .toggle.on::after{left:20px;background:#080809;}
-.status-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;margin-top:6px;}
-.status-tag.ok{background:rgba(200,240,96,.08);color:var(--accent);border:1px solid rgba(200,240,96,.2);}
-.status-tag.err{background:rgba(240,96,128,.08);color:var(--research);border:1px solid rgba(240,96,128,.2);}
-.status-tag.neutral{background:var(--bg4);color:var(--text3);border:1px solid var(--border);}
-
-/* modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.modal-overlay.open{display:flex;}
-.modal-box{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:24px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
-.modal-title{font-size:16px;font-weight:600;margin-bottom:4px;}
-.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px;}
-.modal-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;}
-.modal-input{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;margin-bottom:14px;}
-.modal-input:focus{border-color:rgba(200,240,96,.3);}
-.modal-select{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;margin-bottom:14px;cursor:pointer;}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
-.modal-cancel{background:none;border:1px solid var(--border2);color:var(--text3);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;}
-.modal-confirm{background:var(--accent);color:#080809;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;}
-.modal-confirm:hover{background:#d8ff70;}
-.modal-textarea{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;margin-bottom:14px;resize:none;height:80px;line-height:1.5;}
-
-/* new task team options */
-.team-opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
-.team-opt{padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
-.team-opt:hover{border-color:var(--border2);background:var(--bg4);}
-.team-opt.selected{border-width:1.5px;}
-
-/* toast */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:9px 20px;border-radius:20px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none;}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* rf-btn (filter buttons) */
-.rf-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;color:var(--text3);background:none;transition:all .12s;}
-.rf-btn:hover{color:var(--text2);}
-.rf-btn.active{background:var(--bg3);border-color:var(--border2);color:var(--text);}
+/* select */
+.settings-select{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:7px 28px 7px 10px;border-radius:7px;font-family:var(--mono);font-size:11px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5868'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+/* color row */
+.color-dots{display:flex;gap:6px;}
+.color-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.color-dot:hover{transform:scale(1.15);}
+.color-dot.selected{border-color:white;}
+/* shortcut */
+.shortcut-tag{font-family:var(--mono);font-size:11px;background:var(--bg4);border:1px solid var(--border2);padding:4px 10px;border-radius:5px;color:var(--text2);}
+/* about */
+.about-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;}
+.about-logo{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--music);}
+.about-info{flex:1;}
+.about-version{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.about-link{font-family:var(--mono);font-size:10px;color:var(--dev);cursor:pointer;text-decoration:none;}
 
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-
-/* ══════════════════════════════
-   MOBILE / RESPONSIVE
-══════════════════════════════ */
-
-/* Bottom nav (mobile only) */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--bg2);border-top:1px solid var(--border);z-index:300;padding-bottom:env(safe-area-inset-bottom);}
-.bottom-nav-inner{display:flex;height:56px;}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--text3);font-family:var(--mono);font-size:9px;letter-spacing:.08em;cursor:pointer;transition:color .15s;}
-.bnav-btn.active{color:var(--accent);}
-.bnav-icon{font-size:18px;line-height:1;}
-
-/* Sidebar overlay (mobile) */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:290;backdrop-filter:blur(2px);}
-.sidebar-overlay.open{display:block;}
-
-/* Mobile menu button */
-.mob-menu-btn{display:none;width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;align-items:center;justify-content:center;color:var(--text2);font-size:16px;flex-shrink:0;}
-
-@media (max-width: 767px) {
-  /* topbar: hide desktop nav, show menu btn */
-  .nav-tabs{display:none;}
-  .mob-menu-btn{display:flex;}
-  .api-status-txt-full{display:none;}
-  .sync-badge{display:none;}
-
-  /* pages take full height minus bottom nav */
-  body{padding-bottom:56px;}
-
-  /* bottom nav visible */
-  .bottom-nav{display:flex;}
-
-  /* chat sidebar: off-canvas */
-  .agent-sidebar{
-    position:fixed;left:0;top:44px;bottom:56px;width:80%;max-width:280px;
-    background:var(--bg2);z-index:295;transform:translateX(-100%);
-    transition:transform .25s cubic-bezier(.4,0,.2,1);
-    border-right:1px solid var(--border2);
-  }
-  .agent-sidebar.open{transform:translateX(0);}
-
-  /* sidebar layout: full width for main */
-  .sidebar-layout{grid-template-columns:1fr;}
-
-  /* tasks: 2-col on mobile, scrollable horizontally */
-  .kanban-wrap{
-    display:flex;overflow-x:auto;overflow-y:hidden;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-  }
-  .kanban-col{min-width:84vw;scroll-snap-align:start;border-right:1px solid var(--border);}
-  .kanban-col:last-child{border-right:none;}
-
-  /* settings: full padding */
-  .settings-container{padding:20px 16px;}
-  .settings-input{width:100%;}
-  .settings-row{flex-direction:column;align-items:flex-start;gap:10px;}
-  .settings-row > .toggle{margin-top:0;}
-
-  /* modals: full width on mobile */
-  .modal-box{width:calc(100vw - 32px);max-width:100%;}
-  .team-opt-grid{grid-template-columns:1fr 1fr;}
-
-  /* chat bubbles wider on mobile */
-  .bubble{max-width:90%;}
-
-  /* model switcher: compact */
-  .model-sw .model-sw-name{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-}
-
-@media (min-width:768px) and (max-width:1024px) {
-  /* tablet: narrower sidebar */
-  .sidebar-layout{grid-template-columns:200px 1fr;}
-  .kanban-col{min-width:0;}
-  .settings-container{padding:24px 20px;}
-  .settings-input{width:240px;}
-}
 </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div style="display:flex;align-items:center;gap:10px">
-    <button class="mob-menu-btn" id="mob-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+  <div style="display:flex;align-items:center">
     <div class="logo">CTRL<span>.ai</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('chat',this)">CHAT</button>
       <button class="nav-tab" onclick="showPage('tasks',this)">TASKS</button>
+      <button class="nav-tab" onclick="showPage('teams',this)">TEAMS</button>
       <button class="nav-tab" onclick="showPage('settings',this)">SETTINGS</button>
     </div>
   </div>
   <div class="topbar-right">
-    <div class="api-status" id="api-status-pill" onclick="showPage('settings',document.querySelector('.nav-tab:last-child'))">
-      <div class="pulse err" id="api-pulse"></div>
-      <span id="api-status-txt">未配置 API</span>
-    </div>
-    <div class="sync-badge" id="sync-badge" style="margin-right:4px">
-      <span id="sync-icon">◯</span>
-      <span id="sync-txt">GitHub</span>
-    </div>
+    <div class="status-pill"><div class="pulse"></div>5 AGENTS ONLINE</div>
   </div>
 </div>
-
-<!-- MOBILE SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
-
-<!-- MOBILE BOTTOM NAV -->
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <button class="bnav-btn active" id="bnav-chat" onclick="showPage('chat',this);closeMobileSidebar()">
-      <span class="bnav-icon">💬</span>CHAT
-    </button>
-    <button class="bnav-btn" id="bnav-tasks" onclick="showPage('tasks',this)">
-      <span class="bnav-icon">📋</span>TASKS
-    </button>
-    <button class="bnav-btn" id="bnav-settings" onclick="showPage('settings',this)">
-      <span class="bnav-icon">⚙️</span>SETTINGS
-    </button>
-  </div>
-</nav>
 
 <!-- ════ CHAT PAGE ════ -->
 <div class="page active" id="page-chat">
@@ -369,68 +431,207 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
     <!-- sidebar -->
     <div class="agent-sidebar">
       <div class="sidebar-top">
-        <input class="sidebar-search" placeholder="搜索 agent..." oninput="filterAgents(this.value)"/>
+        <input class="sidebar-search" placeholder="搜索 agent..."/>
+        <div class="add-btn-top" title="添加 Agent" onclick="openAddModal('master')">+</div>
       </div>
-      <div class="agents-scroll" id="agents-scroll">
-        <!-- rendered by JS -->
+      <div class="agents-scroll">
+        <div class="master-sidebar-item active" id="ms-master" onclick="selAgent(this,'🧠','CTRL-Prime','Master Orchestrator','master','claude-opus-4','running')">
+          <div class="master-crown-tag">MASTER</div>
+          <div class="master-avatar">🧠<div class="av-status" style="background:var(--music);box-shadow:0 0 5px var(--music)"></div></div>
+          <div class="master-info"><div class="master-info-name">CTRL-Prime</div><div class="master-info-sub">claude-opus-4 · 协调中</div></div>
+        </div>
+        <!-- DEV -->
+        <div class="team-header"><div class="team-stripe" style="background:var(--dev)"></div><div class="team-label" style="color:var(--dev)">Dev Team</div><div class="team-badge" style="background:rgba(96,184,240,.1);color:var(--dev)">2 running</div></div>
+        <div class="agent-row" style="border-left-color:var(--dev)" onclick="selAgent(this,'CJ','CleverJazz','Music App Dev','dev','claude-sonnet-4','running')">
+          <div class="agent-avatar" style="background:rgba(96,184,240,.12);color:var(--dev)">CJ<div class="av-status" style="background:var(--music);box-shadow:0 0 5px var(--music)"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">CleverJazz</div><div class="agent-model-tag">sonnet-4</div></div><div class="agent-task-preview">TestFlight 上传中...</div></div>
+          <div class="unread-dot" style="background:var(--music);box-shadow:0 0 4px var(--music)"></div>
+        </div>
+        <div class="agent-row" style="border-left-color:var(--dev)" onclick="selAgent(this,'FL','Flutter-CI','Build Agent','dev','claude-haiku-4','running')">
+          <div class="agent-avatar" style="background:rgba(96,184,240,.12);color:var(--dev)">FL<div class="av-status" style="background:var(--music);box-shadow:0 0 5px var(--music)"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">Flutter-CI</div><div class="agent-model-tag">haiku-4</div></div><div class="agent-task-preview">build ipa · 89%</div></div>
+        </div>
+        <!-- RESEARCH -->
+        <div class="team-header"><div class="team-stripe" style="background:var(--research)"></div><div class="team-label" style="color:var(--research)">Research</div><div class="team-badge" style="background:rgba(240,96,128,.1);color:var(--research)">1 idle</div></div>
+        <div class="agent-row" style="border-left-color:var(--research)" onclick="selAgent(this,'RE','Research','Market Analysis','research','claude-sonnet-4','idle')">
+          <div class="agent-avatar" style="background:rgba(240,96,128,.12);color:var(--research)">RE<div class="av-status" style="background:var(--dev)"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">Research</div><div class="agent-model-tag">sonnet-4</div></div><div class="agent-task-preview">等待任务</div></div>
+        </div>
+        <!-- OPS -->
+        <div class="team-header"><div class="team-stripe" style="background:var(--ops)"></div><div class="team-label" style="color:var(--ops)">Ops Team</div><div class="team-badge" style="background:rgba(240,168,64,.1);color:var(--ops)">1 waiting</div></div>
+        <div class="agent-row" style="border-left-color:var(--ops)" onclick="selAgent(this,'EM','Email','Inbox Manager','ops','claude-haiku-4','idle')">
+          <div class="agent-avatar" style="background:rgba(240,168,64,.12);color:var(--ops)">EM<div class="av-status" style="background:var(--dev)"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">Email</div><div class="agent-model-tag">haiku-4</div></div><div class="agent-task-preview">收件箱已清理</div></div>
+        </div>
+        <div class="agent-row" style="border-left-color:var(--ops)" onclick="selAgent(this,'CA','Calendar','Schedule','ops','claude-haiku-4','waiting')">
+          <div class="agent-avatar" style="background:rgba(240,168,64,.12);color:var(--ops)">CA<div class="av-status" style="background:var(--ops);box-shadow:0 0 5px var(--ops);animation:blink 1.5s infinite"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">Calendar</div><div class="agent-model-tag">haiku-4</div></div><div class="agent-task-preview">等待发布日期确认</div></div>
+        </div>
+        <!-- MUSIC -->
+        <div class="team-header"><div class="team-stripe" style="background:var(--music)"></div><div class="team-label" style="color:var(--music)">Music</div><div class="team-badge" style="background:rgba(200,240,96,.06);color:var(--text3)">standby</div></div>
+        <div class="agent-row" style="border-left-color:var(--music)" onclick="selAgent(this,'MU','Music-Tutor','Music Content','music','claude-sonnet-4','offline')">
+          <div class="agent-avatar" style="background:rgba(200,240,96,.07);color:var(--music)">MU<div class="av-status" style="background:var(--text3)"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">Music-Tutor</div><div class="agent-model-tag">sonnet-4</div></div><div class="agent-task-preview">待机</div></div>
+        </div>
       </div>
     </div>
 
     <!-- chat main -->
     <div class="main-content">
       <div class="tab-pane active" id="chat-pane">
-
+        <!-- master banner -->
+        <div class="master-banner" onclick="selAgent(document.getElementById('ms-master'),'🧠','CTRL-Prime','Master Orchestrator','master','claude-opus-4','running')">
+          <div class="master-banner-label">MASTER ORCHESTRATOR</div>
+          <div class="mcb-av">🧠</div>
+          <div class="mcb-info">
+            <div class="mcb-name">CTRL-Prime</div>
+            <div class="mcb-task">协调 CleverJazz v1.2.3 发布 · 分配 TestFlight + 截图任务</div>
+          </div>
+          <div class="mcb-model">claude-opus-4</div>
+        </div>
         <!-- agent header -->
         <div class="chat-header">
-          <div class="chat-header-av" id="hdr-av" style="background:rgba(200,240,96,.12);color:var(--accent)">🧠</div>
+          <div class="chat-header-av" id="hdr-av" style="background:rgba(200,240,96,.12);color:var(--music)">🧠</div>
           <div class="chat-header-info">
             <div class="chat-header-name" id="hdr-name">CTRL-Prime</div>
             <div class="chat-header-meta">
-              <div class="chat-dot" id="hdr-dot" style="background:var(--accent);box-shadow:0 0 5px var(--accent)"></div>
+              <div class="chat-dot" id="hdr-dot" style="background:var(--music);box-shadow:0 0 5px var(--music)"></div>
               <span id="hdr-role">Master Orchestrator</span>
               <span style="color:var(--border2)">·</span>
-              <span id="hdr-tokens" style="color:var(--text3)">0 tokens</span>
+              <span id="hdr-team" style="color:var(--music)">Master</span>
             </div>
           </div>
-          <!-- model switcher -->
           <div class="model-sw" onclick="toggleMDD(event)">
-            <div>
-              <div class="model-sw-lbl">MODEL</div>
-              <div class="model-sw-name" id="hdr-model">—</div>
-            </div>
+            <div><div class="model-sw-lbl">MODEL</div><div class="model-sw-name" id="hdr-model">claude-opus-4</div></div>
             <span style="font-size:9px;color:var(--text3)">▾</span>
-            <div class="model-dd" id="model-dd" onclick="event.stopPropagation()"></div>
+            <div class="model-dd" id="model-dd">
+              <div class="model-opt selected" onclick="setModel('claude-opus-4',event)"><span class="model-chk">✓</span><div class="model-opt-name">claude-opus-4</div><div class="model-opt-desc">Most Capable</div></div>
+              <div class="model-opt" onclick="setModel('claude-sonnet-4',event)"><div class="model-opt-name">claude-sonnet-4</div><div class="model-opt-desc">Fast · Balanced</div></div>
+              <div class="model-opt" onclick="setModel('claude-haiku-4',event)"><div class="model-opt-name">claude-haiku-4</div><div class="model-opt-desc">Fastest · Light</div></div>
+            </div>
           </div>
-          <!-- clear chat -->
-          <button onclick="clearCurrentChat()" style="width:32px;height:32px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;font-size:13px" title="清空对话" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">🗑</button>
         </div>
 
-        <!-- messages -->
-        <div class="chat-messages" id="chat-msgs"></div>
+        <!-- CHAT FILTER BAR -->
+        <div class="chat-filters-bar">
+          <button class="cf-btn active" onclick="setChatFilter('chat',this)"><span class="cf-icon">💬</span>Messages</button>
+          <button class="cf-btn" onclick="setChatFilter('files',this)"><span class="cf-icon">📄</span>Files<span class="cf-count">8</span></button>
+          <button class="cf-btn" onclick="setChatFilter('images',this)"><span class="cf-icon">🖼️</span>Images<span class="cf-count">12</span></button>
+          <button class="cf-btn" onclick="setChatFilter('links',this)"><span class="cf-icon">🔗</span>Links<span class="cf-count">5</span></button>
+          <button class="cf-btn" onclick="setChatFilter('code',this)"><span class="cf-icon">💾</span>Code<span class="cf-count">3</span></button>
+        </div>
 
-        <!-- input -->
+        <!-- MESSAGES -->
+        <div class="chat-messages" id="chat-msgs" style="display:flex">
+          <div class="date-sep"><div class="date-line"></div><div class="date-lbl">TODAY · 2026.03.01</div><div class="date-line"></div></div>
+          <div class="msg-group from-agent">
+            <div class="msg-meta"><div class="msg-av" style="background:rgba(200,240,96,.1);color:var(--music)">🧠</div><div class="msg-sender">CTRL-Prime</div><div class="msg-time">09:00</div></div>
+            <div class="bubble from-agent">早上好！已启动所有 Agent 并分配今日任务。CleverJazz 正在处理 v1.2.3 发布准备。</div>
+            <div class="bubble from-agent">今日优先级：① TestFlight 上传 ② App Store 截图审核 ③ 发布日期确认</div>
+          </div>
+          <div class="msg-group from-user">
+            <div class="msg-meta"><div class="msg-av" style="background:rgba(255,255,255,.06);color:var(--text2)">你</div><div class="msg-time">09:02</div></div>
+            <div class="bubble from-user">发布日期定在3月8号</div>
+          </div>
+          <div class="msg-group from-agent">
+            <div class="msg-meta"><div class="msg-av" style="background:rgba(200,240,96,.1);color:var(--music)">🧠</div><div class="msg-sender">CTRL-Prime</div><div class="msg-time">09:02</div></div>
+            <div class="bubble from-agent">收到，已通知 Calendar 安排 3月8日日程，CleverJazz 发布目标已更新。</div>
+          </div>
+          <div class="msg-group from-agent" id="typing-g">
+            <div class="msg-meta"><div class="msg-av" style="background:rgba(200,240,96,.1);color:var(--music)">🧠</div><div class="msg-sender">CTRL-Prime</div></div>
+            <div class="typing-bub"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- LIBRARY VIEWS -->
+        <div class="library-view" id="lib-files">
+          <div class="lib-list-item"><div class="lib-list-icon">📄</div><div class="lib-list-info"><div class="lib-list-name">Privacy_Policy_v2.pdf</div><div class="lib-list-meta">PDF · 128 KB · 09:10</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">📊</div><div class="lib-list-info"><div class="lib-list-name">Competitor_Reviews_300.xlsx</div><div class="lib-list-meta">Excel · 2.4 MB · 昨天</div></div><div class="lib-list-agent">Research</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">📝</div><div class="lib-list-info"><div class="lib-list-name">metadata.json</div><div class="lib-list-meta">JSON · 4 KB · 昨天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">📦</div><div class="lib-list-info"><div class="lib-list-name">CleverJazz_v1.2.3.ipa</div><div class="lib-list-meta">IPA · 28.4 MB · 上传中</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🗂️</div><div class="lib-list-info"><div class="lib-list-name">supabase_schema.sql</div><div class="lib-list-meta">SQL · 8 KB · 昨天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">📄</div><div class="lib-list-info"><div class="lib-list-name">release_checklist.md</div><div class="lib-list-meta">Markdown · 2 KB · 今天</div></div><div class="lib-list-agent">CTRL-Prime</div></div>
+        </div>
+
+        <div class="library-view" id="lib-images">
+          <div class="library-grid">
+            <div class="lib-item"><div class="lib-thumb">📱</div><div class="lib-info"><div class="lib-info-name">screenshot_1.png</div><div class="lib-info-meta">iPhone 16 · 1290×2796</div></div></div>
+            <div class="lib-item"><div class="lib-thumb">📱</div><div class="lib-info"><div class="lib-info-name">screenshot_2.png</div><div class="lib-info-meta">iPhone 16 · 1290×2796</div></div></div>
+            <div class="lib-item"><div class="lib-thumb">📱</div><div class="lib-info"><div class="lib-info-name">screenshot_3.png</div><div class="lib-info-meta">iPhone 16 · 1290×2796</div></div></div>
+            <div class="lib-item"><div class="lib-thumb">🎵</div><div class="lib-info"><div class="lib-info-name">circle_of_fifths.png</div><div class="lib-info-meta">UI Asset · 800×800</div></div></div>
+            <div class="lib-item"><div class="lib-thumb">🖼️</div><div class="lib-info"><div class="lib-info-name">app_icon_1024.png</div><div class="lib-info-meta">Icon · 1024×1024</div></div></div>
+            <div class="lib-item"><div class="lib-thumb">📊</div><div class="lib-info"><div class="lib-info-name">market_chart.png</div><div class="lib-info-meta">Research · 1200×800</div></div></div>
+          </div>
+        </div>
+
+        <div class="library-view" id="lib-links">
+          <div class="lib-list-item"><div class="lib-list-icon">🔗</div><div class="lib-list-info"><div class="lib-list-name">App Store Connect — CleverJazz</div><div class="lib-list-meta">appstoreconnect.apple.com · 今天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🔗</div><div class="lib-list-info"><div class="lib-list-name">TestFlight Internal Testing</div><div class="lib-list-meta">testflight.apple.com · 今天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🔗</div><div class="lib-list-info"><div class="lib-list-name">Supabase Project Dashboard</div><div class="lib-list-meta">supabase.com · 昨天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🔗</div><div class="lib-list-info"><div class="lib-list-name">Yousician App Store Page</div><div class="lib-list-meta">apps.apple.com · 昨天</div></div><div class="lib-list-agent">Research</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🔗</div><div class="lib-list-info"><div class="lib-list-name">Flutter Build Documentation</div><div class="lib-list-meta">docs.flutter.dev · 昨天</div></div><div class="lib-list-agent">Flutter-CI</div></div>
+        </div>
+
+        <div class="library-view" id="lib-code">
+          <div class="lib-list-item"><div class="lib-list-icon">🟦</div><div class="lib-list-info"><div class="lib-list-name">circle_of_fifths_widget.dart</div><div class="lib-list-meta">Dart · 180 lines · 昨天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🟩</div><div class="lib-list-info"><div class="lib-list-name">supabase_schema.sql</div><div class="lib-list-meta">SQL · 45 lines · 昨天</div></div><div class="lib-list-agent">CleverJazz</div></div>
+          <div class="lib-list-item"><div class="lib-list-icon">🟨</div><div class="lib-list-info"><div class="lib-list-name">upload_testflight.sh</div><div class="lib-list-meta">Shell · 28 lines · 今天</div></div><div class="lib-list-agent">Flutter-CI</div></div>
+        </div>
+
         <div class="chat-input-wrap">
           <div class="chat-input-row">
-            <textarea class="chat-ta" id="chat-ta" placeholder="发消息..." rows="1"
-              onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
-            <button class="send-btn" id="send-btn" style="background:var(--accent)" onclick="sendMsg()">
+            <textarea class="chat-ta" id="chat-ta" placeholder="发消息给 CTRL-Prime..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="send-btn" style="background:var(--music)" onclick="sendMsg()">
               <svg viewBox="0 0 24 24" fill="none" stroke="#080809" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
         </div>
-
       </div>
     </div>
+
+    <!-- right panel -->
+    <div class="right-panel">
+      <div class="rp-stats">
+        <div class="stat-box hi"><div class="stat-val">5</div><div class="stat-lbl">Online</div></div>
+        <div class="stat-box"><div class="stat-val">10</div><div class="stat-lbl">Tasks</div></div>
+        <div class="stat-box"><div class="stat-val">¥0.42</div><div class="stat-lbl">Cost</div></div>
+        <div class="stat-box"><div class="stat-val">38</div><div class="stat-lbl">Msgs</div></div>
+      </div>
+      <div class="rp-hdr">
+        <div class="rp-hdr-top"><div class="rp-title">Activity</div><div class="live-badge"><div class="pulse" style="width:5px;height:5px"></div>LIVE</div></div>
+        <div class="legend-grid">
+          <div class="l-item"><div class="l-dot" style="background:var(--music);box-shadow:0 0 4px var(--music)"></div><div class="l-text"><b>Running</b>执行中</div></div>
+          <div class="l-item"><div class="l-dot" style="background:var(--ops)"></div><div class="l-text"><b>Waiting</b>等待中</div></div>
+          <div class="l-item"><div class="l-dot" style="background:var(--dev)"></div><div class="l-text"><b>Idle</b>空闲</div></div>
+          <div class="l-item"><div class="l-dot" style="background:var(--text3)"></div><div class="l-text"><b>Offline</b>离线</div></div>
+        </div>
+        <div class="team-pills">
+          <div class="team-pill" style="background:rgba(96,184,240,.08);border-color:rgba(96,184,240,.2);color:var(--dev)"><div style="width:5px;height:5px;border-radius:50%;background:var(--dev)"></div>Dev</div>
+          <div class="team-pill" style="background:rgba(240,96,128,.08);border-color:rgba(240,96,128,.2);color:var(--research)"><div style="width:5px;height:5px;border-radius:50%;background:var(--research)"></div>Research</div>
+          <div class="team-pill" style="background:rgba(240,168,64,.08);border-color:rgba(240,168,64,.2);color:var(--ops)"><div style="width:5px;height:5px;border-radius:50%;background:var(--ops)"></div>Ops</div>
+          <div class="team-pill" style="background:rgba(200,240,96,.06);border-color:rgba(200,240,96,.15);color:var(--music)"><div style="width:5px;height:5px;border-radius:50%;background:var(--music)"></div>Music</div>
+        </div>
+      </div>
+      <div class="rp-filters">
+        <button class="rf-btn active" onclick="filterAct('all',this)">ALL</button>
+        <button class="rf-btn" onclick="filterAct('task',this)">TASK</button>
+        <button class="rf-btn" onclick="filterAct('chat',this)">CHAT</button>
+        <button class="rf-btn" onclick="filterAct('error',this)">ERROR</button>
+      </div>
+      <div class="rp-list" id="rp-list"></div>
+    </div>
+
   </div>
 </div>
 
-<!-- ════ TASKS PAGE ════ -->
+<!-- ════ TASKS PAGE — full width ════ -->
 <div class="page" id="page-tasks" style="flex-direction:column">
 
-  <div class="tasks-topbar">
+  <!-- board topbar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
     <div>
       <div style="font-size:15px;font-weight:600">Task Board</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px" id="tb-meta">0 tasks</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px" id="tb-meta">10 tasks · 2 in progress</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <div style="display:flex;gap:4px" id="tb-filters">
@@ -438,38 +639,267 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
         <button class="rf-btn" onclick="tbFilter('dev',this)">DEV</button>
         <button class="rf-btn" onclick="tbFilter('research',this)">RESEARCH</button>
         <button class="rf-btn" onclick="tbFilter('ops',this)">OPS</button>
-        <button class="rf-btn" onclick="tbFilter('master',this)">MASTER</button>
+        <button class="rf-btn" onclick="tbFilter('music',this)">MUSIC</button>
       </div>
-      <button onclick="openNewTaskModal()"
-        style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--accent);color:#080809;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:all .15s"
-        onmouseover="this.style.background='#d8ff70'" onmouseout="this.style.background='var(--accent)'">
+      <button onclick="openNewTask()" style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#d8ff70'" onmouseout="this.style.background='var(--music)'">
         <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#080809" stroke-width="2" stroke-linecap="round"/></svg>
         New Task
       </button>
     </div>
   </div>
 
-  <div class="kanban-wrap">
-    <div class="kanban-col">
-      <div class="col-top-stripe" style="background:var(--border2)"></div>
-      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">📥</span><span class="col-title">To Do</span><span class="col-count" id="cnt-todo">0</span></div><div class="col-desc">新任务 · 点击 ▶ 开始</div></div>
-      <div class="col-body" id="body-todo"></div>
+  <!-- kanban -->
+  <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden">
+
+    <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden">
+      <div style="height:2px;background:var(--border2);flex-shrink:0"></div>
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px">📥</span>
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2)">To Do</span>
+          <span style="font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto" id="cnt-todo">3</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">新任务准备区 · 点击 ▶ 开始执行</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent" id="body-todo"></div>
     </div>
-    <div class="kanban-col">
-      <div class="col-top-stripe" style="background:var(--dev)"></div>
-      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">⚡</span><span class="col-title">In Progress</span><span class="col-count" id="cnt-progress">0</span></div><div class="col-desc">执行中 · 点击查看详情</div></div>
-      <div class="col-body" id="body-progress"></div>
+
+    <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden">
+      <div style="height:2px;background:var(--dev);flex-shrink:0"></div>
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px">⚡</span>
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2)">In Progress</span>
+          <span style="font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto" id="cnt-progress">2</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">Agent 正在执行 · 点击查看思考过程</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent" id="body-progress"></div>
     </div>
-    <div class="kanban-col">
-      <div class="col-top-stripe" style="background:var(--ops)"></div>
-      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">👁</span><span class="col-title">Review</span><span class="col-count" id="cnt-review">0</span></div><div class="col-desc">等待确认 · 点击审阅</div></div>
-      <div class="col-body" id="body-review"></div>
+
+    <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden">
+      <div style="height:2px;background:var(--ops);flex-shrink:0"></div>
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px">👁</span>
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2)">Review</span>
+          <span style="font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto" id="cnt-review">1</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">等待你确认 · 满意点 ✓ Done</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent" id="body-review"></div>
     </div>
-    <div class="kanban-col">
-      <div class="col-top-stripe" style="background:var(--accent)"></div>
-      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">✅</span><span class="col-title">Done</span><span class="col-count" id="cnt-done">0</span></div><div class="col-desc">已完成归档</div></div>
-      <div class="col-body" id="body-done"></div>
+
+    <div style="display:flex;flex-direction:column;overflow:hidden">
+      <div style="height:2px;background:var(--music);flex-shrink:0"></div>
+      <div style="padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px">✅</span>
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2)">Done</span>
+          <span style="font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto" id="cnt-done">4</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">已完成归档</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent" id="body-done"></div>
     </div>
+
+  </div>
+</div>
+
+<!-- TASK DETAIL DRAWER -->
+<div id="drawer-overlay" onclick="closeDrawer()" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)"></div>
+<div id="drawer" style="position:fixed;top:44px;right:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:401;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;flex-shrink:0" id="drawer-header-area">
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:600;line-height:1.4" id="drawer-title-el"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px" id="drawer-status-row"></div>
+    </div>
+    <button onclick="closeDrawer()" style="width:28px;height:28px;border-radius:6px;background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">✕</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent" id="drawer-body-el"></div>
+  <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0" id="drawer-footer-el"></div>
+</div>
+
+<!-- NEW TASK MODAL -->
+<div id="ntask-modal" onclick="if(event.target===this)closeNewTask()" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div onclick="event.stopPropagation()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:24px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,.7)">
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px">New Task</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:22px">创建后自动分配给对应 Team 的 Master Agent</div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px">任务标题 *</div>
+    <input id="nt-title" placeholder="描述你想要完成的事..." style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;margin-bottom:16px" onfocus="this.style.borderColor='rgba(200,240,96,.35)'" onblur="this.style.borderColor='var(--border2)'" />
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px">任务描述（可选）</div>
+    <textarea id="nt-desc" placeholder="更多背景信息..." style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;margin-bottom:16px;resize:none;height:68px;line-height:1.5" onfocus="this.style.borderColor='rgba(200,240,96,.35)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px">分配到哪个 Team？</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px" id="nt-team-grid">
+      <div class="nt-topt selected" data-team="dev" data-color="var(--dev)" onclick="ntSelTeam(this)" style="padding:10px 12px;border-radius:8px;border:1.5px solid var(--dev);cursor:pointer;display:flex;align-items:center;gap:8px;background:rgba(96,184,240,.04)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--dev);flex-shrink:0"></div>
+        <div><div style="font-size:12px;font-weight:500">Dev Team</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px">CleverJazz · Flutter-CI</div></div>
+      </div>
+      <div class="nt-topt" data-team="research" data-color="var(--research)" onclick="ntSelTeam(this)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--research);flex-shrink:0"></div>
+        <div><div style="font-size:12px;font-weight:500">Research</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px">Research Agent</div></div>
+      </div>
+      <div class="nt-topt" data-team="ops" data-color="var(--ops)" onclick="ntSelTeam(this)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--ops);flex-shrink:0"></div>
+        <div><div style="font-size:12px;font-weight:500">Ops Team</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px">Email · Calendar</div></div>
+      </div>
+      <div class="nt-topt" data-team="music" data-color="var(--music)" onclick="ntSelTeam(this)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--music);flex-shrink:0"></div>
+        <div><div style="font-size:12px;font-weight:500">Music Team</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px">Music-Tutor</div></div>
+      </div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px">优先级</div>
+    <div style="display:flex;gap:6px;margin-bottom:20px" id="nt-pri-row">
+      <div class="nt-popt" data-p="low" onclick="ntSelPri(this)" style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--border);cursor:pointer;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3);transition:all .15s">🔵 Low</div>
+      <div class="nt-popt selected" data-p="mid" onclick="ntSelPri(this)" style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--dev);cursor:pointer;text-align:center;font-family:var(--mono);font-size:10px;color:var(--dev);background:var(--bg4);transition:all .15s">🟡 Mid</div>
+      <div class="nt-popt" data-p="high" onclick="ntSelPri(this)" style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--border);cursor:pointer;text-align:center;font-family:var(--mono);font-size:10px;color:var(--ops);transition:all .15s">🔴 High</div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeNewTask()" style="background:none;border:1px solid var(--border2);color:var(--text3);padding:9px 18px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px">取消</button>
+      <button onclick="createTask()" style="background:var(--music);color:#080809;border:none;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600">创建任务</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TEAMS PAGE — full width ════ -->
+<div class="teams-page" id="page-teams">
+
+  <!-- CANVAS -->
+  <div class="canvas-panel" id="canvas-panel">
+    <!-- toolbar -->
+    <div class="canvas-toolbar">
+      <button class="ct-btn" onclick="resetView()">⌂ Reset</button>
+      <div class="ct-sep"></div>
+      <button class="ct-btn" onclick="zoomIn()">＋</button>
+      <div class="ct-zoom" id="zoom-label">100%</div>
+      <button class="ct-btn" onclick="zoomOut()">－</button>
+      <div class="ct-sep"></div>
+      <button class="ct-btn" onclick="openAddModal('master')">＋ Add Agent</button>
+    </div>
+
+    <!-- zoom controls -->
+    <div class="zoom-controls">
+      <button class="zc-btn" onclick="zoomIn()">+</button>
+      <button class="zc-btn" onclick="zoomOut()">−</button>
+    </div>
+
+    <!-- SVG for lines -->
+    <svg class="canvas-svg" id="canvas-svg"></svg>
+
+    <!-- canvas world (all nodes here) -->
+    <div class="canvas-world" id="canvas-world">
+
+      <!-- MASTER NODE -->
+      <div class="cn-master" id="cn-master" style="left:400px;top:60px" onclick="selTreeNode('master',event)">
+        <div class="cn-crown">MASTER AGENT</div>
+        <div class="cn-header">
+          <div class="cn-icon">🧠</div>
+          <div><div class="cn-name">CTRL-Prime</div><div class="cn-model">claude-opus-4</div></div>
+          <div class="cn-status">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--music);box-shadow:0 0 6px var(--music);animation:blink 2s infinite"></div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--music)">ACTIVE</span>
+          </div>
+        </div>
+        <div class="cn-task-row"><div class="cn-task-lbl">Current Goal</div>协调 v1.2.3 发布流程，管理所有 team</div>
+      </div>
+
+      <!-- ADD UNDER MASTER -->
+      <div class="cn-add-btn" style="left:510px;top:220px" title="在 Master 下添加 Team" onclick="openAddModal('master')">+</div>
+
+      <!-- DEV TEAM -->
+      <div class="cn-team" id="cn-dev" style="left:100px;top:310px;border-left:2px solid var(--dev)" onclick="selTreeNode('dev-team',event)">
+        <div class="cn-team-header"><div class="cn-team-icon">⚙️</div><div class="cn-team-name" style="color:var(--dev)">Dev Team</div><div class="cn-team-count">2</div></div>
+        <div class="cn-team-status"><div style="width:6px;height:6px;border-radius:50%;background:var(--music);box-shadow:0 0 4px var(--music)"></div>2 running</div>
+      </div>
+      <div class="cn-add-btn" style="left:272px;top:325px" title="添加到 Dev Team" onclick="openAddModal('dev')">+</div>
+
+      <div class="cn-agent" id="cn-cj" style="left:60px;top:480px" onclick="selTreeNode('cj',event)">
+        <div class="cn-agent-badge sb-run">RUN</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(96,184,240,.12);color:var(--dev)">CJ</div><div class="cn-agent-name">CleverJazz</div><div class="cn-agent-dot" style="background:var(--music);box-shadow:0 0 4px var(--music)"></div></div>
+        <div class="cn-agent-task">TestFlight 上传 v1.2.3</div>
+        <div class="cn-agent-from">↑ CTRL-Prime</div>
+      </div>
+
+      <div class="cn-agent" id="cn-fl" style="left:220px;top:480px" onclick="selTreeNode('flutter',event)">
+        <div class="cn-agent-badge sb-run">RUN</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(96,184,240,.12);color:var(--dev)">FL</div><div class="cn-agent-name">Flutter-CI</div><div class="cn-agent-dot" style="background:var(--music);box-shadow:0 0 4px var(--music)"></div></div>
+        <div class="cn-agent-task">build ipa · 89%</div>
+        <div class="cn-agent-from">↑ CleverJazz</div>
+      </div>
+
+      <!-- RESEARCH TEAM -->
+      <div class="cn-team" id="cn-research" style="left:370px;top:310px;border-left:2px solid var(--research)" onclick="selTreeNode('research-team',event)">
+        <div class="cn-team-header"><div class="cn-team-icon">🔍</div><div class="cn-team-name" style="color:var(--research)">Research</div><div class="cn-team-count">1</div></div>
+        <div class="cn-team-status"><div style="width:6px;height:6px;border-radius:50%;background:var(--dev)"></div>1 idle</div>
+      </div>
+      <div class="cn-add-btn" style="left:542px;top:325px" title="添加到 Research" onclick="openAddModal('research')">+</div>
+
+      <div class="cn-agent" id="cn-re" style="left:380px;top:480px" onclick="selTreeNode('research',event)">
+        <div class="cn-agent-badge sb-idle">IDLE</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(240,96,128,.12);color:var(--research)">RE</div><div class="cn-agent-name">Research</div><div class="cn-agent-dot" style="background:var(--dev)"></div></div>
+        <div class="cn-agent-task">等待下一个任务</div>
+        <div class="cn-agent-from">↑ CTRL-Prime</div>
+      </div>
+
+      <!-- OPS TEAM -->
+      <div class="cn-team" id="cn-ops" style="left:600px;top:310px;border-left:2px solid var(--ops)" onclick="selTreeNode('ops-team',event)">
+        <div class="cn-team-header"><div class="cn-team-icon">📋</div><div class="cn-team-name" style="color:var(--ops)">Ops Team</div><div class="cn-team-count">2</div></div>
+        <div class="cn-team-status"><div style="width:6px;height:6px;border-radius:50%;background:var(--ops);animation:blink 1.5s infinite"></div>1 waiting</div>
+      </div>
+      <div class="cn-add-btn" style="left:772px;top:325px" title="添加到 Ops Team" onclick="openAddModal('ops')">+</div>
+
+      <div class="cn-agent" id="cn-em" style="left:570px;top:480px" onclick="selTreeNode('email',event)">
+        <div class="cn-agent-badge sb-idle">IDLE</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(240,168,64,.12);color:var(--ops)">EM</div><div class="cn-agent-name">Email</div><div class="cn-agent-dot" style="background:var(--dev)"></div></div>
+        <div class="cn-agent-task">收件箱已清理</div>
+        <div class="cn-agent-from">↑ CTRL-Prime</div>
+      </div>
+
+      <div class="cn-agent" id="cn-ca" style="left:730px;top:480px" onclick="selTreeNode('calendar',event)">
+        <div class="cn-agent-badge sb-wait">WAIT</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(240,168,64,.12);color:var(--ops)">CA</div><div class="cn-agent-name">Calendar</div><div class="cn-agent-dot" style="background:var(--ops);box-shadow:0 0 4px var(--ops)"></div></div>
+        <div class="cn-agent-task">等待发布日期确认</div>
+        <div class="cn-agent-from">↑ CTRL-Prime</div>
+      </div>
+
+      <!-- MUSIC TEAM -->
+      <div class="cn-team" id="cn-music" style="left:840px;top:310px;border-left:2px solid var(--music)" onclick="selTreeNode('music-team',event)">
+        <div class="cn-team-header"><div class="cn-team-icon">🎵</div><div class="cn-team-name" style="color:var(--music)">Music</div><div class="cn-team-count">1</div></div>
+        <div class="cn-team-status"><div style="width:6px;height:6px;border-radius:50%;background:var(--text3)"></div>standby</div>
+      </div>
+      <div class="cn-add-btn" style="left:1012px;top:325px" title="添加到 Music Team" onclick="openAddModal('music')">+</div>
+
+      <div class="cn-agent" id="cn-mu" style="left:860px;top:480px" onclick="selTreeNode('music',event)">
+        <div class="cn-agent-badge sb-idle">IDLE</div>
+        <div class="cn-agent-top"><div class="cn-agent-av" style="background:rgba(200,240,96,.07);color:var(--music)">MU</div><div class="cn-agent-name">Music-Tutor</div><div class="cn-agent-dot" style="background:var(--text3)"></div></div>
+        <div class="cn-agent-task">待机</div>
+        <div class="cn-agent-from">↑ CTRL-Prime</div>
+      </div>
+
+    </div><!-- canvas-world -->
+  </div><!-- canvas-panel -->
+
+  <!-- DETAIL PANEL -->
+  <div class="teams-detail">
+    <div class="td-agent-card" id="td-card">
+      <div class="td-empty">← 点击地图上任意节点<br>查看 Agent 详情</div>
+    </div>
+    <div class="td-log-header">
+      <div class="td-log-title">System Log</div>
+      <button class="td-log-clear" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="td-log-filters">
+      <button class="lf-btn active" onclick="filterLog('all',this)">ALL</button>
+      <button class="lf-btn" onclick="filterLog('task',this)">TASK</button>
+      <button class="lf-btn" onclick="filterLog('agent',this)">AGENT</button>
+      <button class="lf-btn" onclick="filterLog('error',this)">ERROR</button>
+    </div>
+    <div class="td-log-list" id="td-log-list"></div>
   </div>
 
 </div>
@@ -478,1143 +908,730 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 <div class="settings-page" id="page-settings">
   <div class="settings-container">
     <div class="settings-title">Settings</div>
-    <div class="settings-sub">配置 API 接口与 GitHub 存储</div>
+    <div class="settings-sub">个性化你的 CTRL 控制台</div>
 
-    <!-- AI API -->
     <div class="settings-section">
-      <div class="settings-section-title">AI API — OpenAI 兼容接口</div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">API Endpoint</div>
-          <div class="settings-row-desc">OpenClaw / OpenAI 兼容的 base URL，例如 https://api.openclaw.ai/v1</div>
-        </div>
-        <input class="settings-input full" id="cfg-endpoint" placeholder="https://api.openclaw.ai/v1"
-          onchange="saveSetting('api_endpoint',this.value);updateApiStatus()" />
-      </div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">API Key</div>
-          <div class="settings-row-desc">Bearer Token，存于 localStorage，不上传</div>
-        </div>
-        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
-          <input class="settings-input" id="cfg-apikey" type="password" placeholder="sk-..."
-            style="flex:1" onchange="saveSetting('api_key',this.value);updateApiStatus()" />
-          <button class="settings-btn secondary" onclick="testApi()">Test Connection</button>
-        </div>
-        <div id="api-test-result" style="margin-top:6px"></div>
-      </div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">默认模型</div>
-          <div class="settings-row-desc">发消息时默认使用的模型 ID</div>
-        </div>
-        <input class="settings-input full" id="cfg-model" placeholder="gpt-4o / claude-3-5-sonnet-20241022"
-          onchange="saveSetting('default_model',this.value);renderModelDropdown()" />
-      </div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">备用模型（可选）</div>
-          <div class="settings-row-desc">多个模型用逗号分隔，会出现在 model switcher 中</div>
-        </div>
-        <input class="settings-input full" id="cfg-models-extra" placeholder="gpt-4o-mini, claude-3-haiku-20240307"
-          onchange="saveSetting('models_extra',this.value);renderModelDropdown()" />
-      </div>
-    </div>
-
-    <!-- GitHub -->
-    <div class="settings-section">
-      <div class="settings-section-title">GitHub — Task 持久化存储</div>
-      <div style="background:rgba(200,240,96,.04);border:1px solid rgba(200,240,96,.12);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6">
-        Tasks 以 JSON 格式存储在 GitHub Gist 中。需要一个 Personal Access Token（gist scope）。<br>
-        <a href="https://github.com/settings/tokens/new?scopes=gist&description=CTRL.ai" target="_blank"
-          style="color:var(--dev);text-decoration:none;font-family:var(--mono);font-size:11px">→ 生成 GitHub Token</a>
-      </div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">GitHub Token</div>
-          <div class="settings-row-desc">ghp_... · 仅需 gist scope</div>
-        </div>
-        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
-          <input class="settings-input" id="cfg-gh-token" type="password" placeholder="ghp_..."
-            style="flex:1" onchange="saveSetting('github_token',this.value)" />
-          <button class="settings-btn secondary" onclick="testGithub()">Test</button>
-        </div>
-        <div id="gh-test-result" style="margin-top:6px"></div>
-      </div>
-
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
-        <div class="settings-row-info">
-          <div class="settings-row-label">Gist ID</div>
-          <div class="settings-row-desc">留空则自动创建新 Gist；或粘贴已有 Gist ID</div>
-        </div>
-        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
-          <input class="settings-input" id="cfg-gist-id" placeholder="留空自动创建"
-            style="flex:1" onchange="saveSetting('gist_id',this.value)" />
-          <button class="settings-btn secondary" onclick="loadFromGist(true)">Load</button>
-          <button class="settings-btn" onclick="saveToGist(true)">Save Now</button>
-        </div>
-      </div>
-
+      <div class="settings-section-title">General</div>
       <div class="settings-row">
-        <div class="settings-row-info">
-          <div class="settings-row-label">自动同步</div>
-          <div class="settings-row-desc">Task 变更时自动保存到 Gist</div>
-        </div>
-        <div class="toggle on" id="toggle-autosync" onclick="toggleAutoSync(this)"></div>
+        <div class="settings-row-info"><div class="settings-row-label">Language / 语言</div><div class="settings-row-desc">Interface display language</div></div>
+        <select class="settings-select"><option>中文</option><option>English</option></select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Startup Page</div><div class="settings-row-desc">Which page to open on launch</div></div>
+        <select class="settings-select"><option>CHAT</option><option>TASKS</option><option>TEAMS</option></select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Sound Notifications</div><div class="settings-row-desc">Play sound when agent completes a task</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Desktop Notifications</div><div class="settings-row-desc">Browser push notifications for agent activity</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
       </div>
     </div>
 
-    <!-- Agents -->
-    <div class="settings-section">
-      <div class="settings-section-title">Agents 配置</div>
-      <div id="agents-config-list"></div>
-      <button class="settings-btn secondary" style="margin-top:12px" onclick="openAddAgentModal()">+ 添加 Agent</button>
-    </div>
-
-    <!-- Appearance -->
     <div class="settings-section">
       <div class="settings-section-title">Appearance</div>
+      <div class="settings-row" style="align-items:flex-start;padding:16px 0">
+        <div class="settings-row-info"><div class="settings-row-label">Theme</div><div class="settings-row-desc">Choose between dark and light interface</div></div>
+        <div style="display:flex;gap:10px;flex-shrink:0">
+          <!-- DARK -->
+          <div class="theme-opt" data-dark="1" onclick="setTheme(true)" style="width:96px;border-radius:10px;border:1.5px solid var(--dev);background:rgba(96,184,240,.06);cursor:pointer;overflow:hidden;transition:all .2s">
+            <div style="background:#080809;height:52px;padding:8px;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;gap:4px"><div style="width:28px;height:5px;border-radius:2px;background:#c8f060;opacity:.9"></div><div style="flex:1;height:5px;border-radius:2px;background:rgba(255,255,255,.1)"></div></div>
+              <div style="flex:1;background:#141418;border-radius:3px;border:1px solid rgba(255,255,255,.07)"></div>
+            </div>
+            <div style="padding:7px 10px;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">Dark</span>
+              <span style="font-size:11px;color:var(--dev)">✓</span>
+            </div>
+          </div>
+          <!-- LIGHT -->
+          <div class="theme-opt" data-dark="0" onclick="setTheme(false)" style="width:96px;border-radius:10px;border:1px solid var(--border);cursor:pointer;overflow:hidden;transition:all .2s">
+            <div style="background:#f4f5f7;height:52px;padding:8px;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;gap:4px"><div style="width:28px;height:5px;border-radius:2px;background:#4a8c00;opacity:.9"></div><div style="flex:1;height:5px;border-radius:2px;background:rgba(0,0,0,.1)"></div></div>
+              <div style="flex:1;background:#ffffff;border-radius:3px;border:1px solid rgba(0,0,0,.08)"></div>
+            </div>
+            <div style="padding:7px 10px;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">Light</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="settings-row">
-        <div class="settings-row-info"><div class="settings-row-label">Theme</div><div class="settings-row-desc">深色 / 浅色</div></div>
-        <div class="toggle" id="toggle-theme" onclick="toggleTheme(this)"></div>
+        <div class="settings-row-info"><div class="settings-row-label">Compact Mode</div><div class="settings-row-desc">Reduce padding for denser layout</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
       </div>
     </div>
 
-    <!-- About -->
     <div class="settings-section">
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px">
-        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent)">CTRL</div>
-        <div>
-          <div style="font-size:13px;font-weight:500">CTRL.ai MVP</div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">v0.1.0 · Chat + Tasks · OpenAI-compatible API</div>
+      <div class="settings-section-title">Default Model</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Master Agent</div><div class="settings-row-desc">Model used for CTRL-Prime orchestration</div></div>
+        <select class="settings-select"><option>claude-opus-4</option><option>claude-sonnet-4</option></select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Sub Agents</div><div class="settings-row-desc">Default model for newly created agents</div></div>
+        <select class="settings-select"><option>claude-sonnet-4</option><option>claude-haiku-4</option><option>claude-opus-4</option></select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Max Tokens per Request</div><div class="settings-row-desc">Token limit per API call</div></div>
+        <select class="settings-select"><option>4,096</option><option selected>8,192</option><option>32,000</option></select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Privacy & Security</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Chat History</div><div class="settings-row-desc">Store chat history locally</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Activity Logging</div><div class="settings-row-desc">Log all agent actions for audit trail</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Cloudflare Tunnel</div><div class="settings-row-desc">Remote access via encrypted tunnel</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Access Password</div><div class="settings-row-desc">Require password to open dashboard</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Keyboard Shortcuts</div>
+      <div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">Send Message</div></div><div class="shortcut-tag">⏎ Enter</div></div>
+      <div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">New Line</div></div><div class="shortcut-tag">⇧ Shift + Enter</div></div>
+      <div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">Switch to Chat</div></div><div class="shortcut-tag">⌘ 1</div></div>
+      <div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">Switch to Tasks</div></div><div class="shortcut-tag">⌘ 2</div></div>
+      <div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">Switch to Teams</div></div><div class="shortcut-tag">⌘ 3</div></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">About</div>
+      <div class="about-card">
+        <div class="about-logo">CTRL</div>
+        <div class="about-info">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">CTRL.ai — Personal AI Command Center</div>
+          <div class="about-version">Version 1.0.0 · Built on Next.js · Running locally</div>
+          <div style="margin-top:6px;display:flex;gap:12px">
+            <a class="about-link">Documentation</a>
+            <a class="about-link">GitHub</a>
+            <a class="about-link">Report Issue</a>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ════ NEW TASK MODAL ════ -->
-<div class="modal-overlay" id="new-task-modal" onclick="if(event.target===this)closeNewTaskModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-title">New Task</div>
-    <div class="modal-sub">创建后可指派 Agent 执行</div>
-
-    <div class="modal-label">任务标题 *</div>
-    <input class="modal-input" id="nt-title" placeholder="描述你想要完成的事..."
-      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"
-      onkeydown="if(event.key==='Enter')createTask()" />
-
-    <div class="modal-label">任务描述（可选）</div>
-    <textarea class="modal-textarea" id="nt-desc" placeholder="更多背景信息..."
-      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
-
-    <div class="modal-label">分配团队</div>
-    <div class="team-opt-grid" id="nt-team-grid"></div>
-
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeNewTaskModal()">取消</button>
-      <button class="modal-confirm" onclick="createTask()">创建任务</button>
+<!-- ADD AGENT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">添加 Agent</div>
+    <div class="modal-sub">选择添加位置和类型</div>
+    <div class="modal-label">Agent 名称</div>
+    <input class="modal-input" id="modal-name" placeholder="例如：Deploy-CI"/>
+    <div class="modal-label">添加到</div>
+    <div class="modal-options" id="modal-opts">
+      <div class="modal-opt selected" onclick="selModalOpt(this,'master')"><div class="modal-opt-icon">🧠</div><div class="modal-opt-name">Master Level</div><div class="modal-opt-desc">新建独立 Master</div></div>
+      <div class="modal-opt" onclick="selModalOpt(this,'dev')"><div class="modal-opt-icon">⚙️</div><div class="modal-opt-name">Dev Team</div><div class="modal-opt-desc">加入开发团队</div></div>
+      <div class="modal-opt" onclick="selModalOpt(this,'research')"><div class="modal-opt-icon">🔍</div><div class="modal-opt-name">Research</div><div class="modal-opt-desc">加入研究团队</div></div>
+      <div class="modal-opt" onclick="selModalOpt(this,'ops')"><div class="modal-opt-icon">📋</div><div class="modal-opt-name">Ops Team</div><div class="modal-opt-desc">加入运营团队</div></div>
     </div>
-  </div>
-</div>
-
-<!-- ════ ADD AGENT MODAL ════ -->
-<div class="modal-overlay" id="add-agent-modal" onclick="if(event.target===this)closeAddAgentModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-title">Add Agent</div>
-    <div class="modal-sub">添加一个新的 AI 助手到 Chat 列表</div>
-
-    <div class="modal-label">名称</div>
-    <input class="modal-input" id="aa-name" placeholder="Agent Name"
-      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'" />
-
-    <div class="modal-label">角色描述</div>
-    <input class="modal-input" id="aa-role" placeholder="e.g. Dev Assistant"
-      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'" />
-
-    <div class="modal-label">团队</div>
-    <select class="modal-select" id="aa-team">
-      <option value="master">Master</option>
-      <option value="dev">Dev</option>
-      <option value="research">Research</option>
-      <option value="ops">Ops</option>
+    <div class="modal-label">默认 Model</div>
+    <select class="modal-input" style="padding:8px 12px;margin-bottom:20px">
+      <option>claude-sonnet-4</option><option>claude-haiku-4</option><option>claude-opus-4</option>
     </select>
-
-    <div class="modal-label">System Prompt</div>
-    <textarea class="modal-textarea" id="aa-system" style="height:100px" placeholder="You are a helpful AI assistant..."
-      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
-
     <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeAddAgentModal()">取消</button>
-      <button class="modal-confirm" onclick="addAgent()">添加</button>
+      <button class="modal-cancel" onclick="closeModal()">取消</button>
+      <button class="modal-confirm" onclick="confirmAddAgent()">添加</button>
     </div>
   </div>
 </div>
-
-<!-- TOAST -->
-<div id="toast"></div>
 
 <script>
-'use strict';
-
-// ══════════════════════════════════════
-// CONFIG — localStorage backed
-// ══════════════════════════════════════
-const cfg = {
-  get(k, def = '') { return localStorage.getItem('ctrl_' + k) ?? def; },
-  set(k, v) { localStorage.setItem('ctrl_' + k, String(v)); },
-};
-function saveSetting(key, val) { cfg.set(key, val); }
-
-// ══════════════════════════════════════
-// AGENTS STATE
-// ══════════════════════════════════════
-const TEAM_COLORS = {
-  master: { color: 'var(--accent)', rgb: '200,240,96' },
-  dev:    { color: 'var(--dev)',    rgb: '96,184,240' },
-  research:{ color: 'var(--research)', rgb: '240,96,128' },
-  ops:    { color: 'var(--ops)',    rgb: '240,168,64' },
-};
-
-function getDefaultAgents() {
-  return [
-    { id: 'prime', name: 'CTRL-Prime', role: 'Master Orchestrator', team: 'master', init: '🧠',
-      system: 'You are CTRL-Prime, an intelligent AI assistant and task coordinator. You help the user plan, organize, and execute complex multi-step goals. Be concise, practical, and proactive. Respond in the language the user uses.' },
-    { id: 'dev', name: 'Dev Agent', role: 'Software Developer', team: 'dev', init: 'DV',
-      system: 'You are a senior software developer AI. You help with coding, architecture decisions, debugging, and technical planning. Provide code examples when relevant. Respond in the language the user uses.' },
-    { id: 'research', name: 'Research', role: 'Market & Data Research', team: 'research', init: 'RE',
-      system: 'You are a research analyst AI. You help with market research, competitive analysis, data summarization, and information gathering. Be thorough and cite sources when available. Respond in the language the user uses.' },
-  ];
-}
-
-let agents = [];
-function loadAgents() {
-  try {
-    const stored = cfg.get('agents', '');
-    agents = stored ? JSON.parse(stored) : getDefaultAgents();
-  } catch { agents = getDefaultAgents(); }
-}
-function saveAgents() { cfg.set('agents', JSON.stringify(agents)); }
-
-// ══════════════════════════════════════
-// CONVERSATIONS (in-memory per session)
-// ══════════════════════════════════════
-const conversations = {}; // agentId -> [{role, content}]
-let currentAgentId = null;
-let currentModel = '';
-let isSending = false;
-let totalTokens = 0;
-
-function getConversation(agentId) {
-  if (!conversations[agentId]) conversations[agentId] = [];
-  return conversations[agentId];
-}
-
-// ══════════════════════════════════════
-// TASKS STATE
-// ══════════════════════════════════════
-let taskData = [];
-let tbFilterTeam = 'all';
-let ntTeam = 'dev';
-let autoSync = true;
-
-function loadTasksFromLocal() {
-  try {
-    const s = cfg.get('tasks_local', '');
-    if (s) taskData = JSON.parse(s);
-    else taskData = [];
-  } catch { taskData = []; }
-}
-function saveTasksToLocal() {
-  cfg.set('tasks_local', JSON.stringify(taskData));
-}
-
-// ══════════════════════════════════════
-// GITHUB GIST
-// ══════════════════════════════════════
-let syncTimeout = null;
-
-function scheduleSave() {
-  if (!autoSync) return;
-  clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(() => saveToGist(false), 2000);
-}
-
-async function saveToGist(manual = false) {
-  const token = cfg.get('github_token');
-  if (!token) { if (manual) showToast('请先配置 GitHub Token'); return; }
-  setSyncState('syncing');
-  const gistId = cfg.get('gist_id');
-  const payload = {
-    files: {
-      'ctrl_tasks.json': { content: JSON.stringify(taskData, null, 2) }
-    }
-  };
-  try {
-    const url = gistId
-      ? `https://api.github.com/gists/${gistId}`
-      : 'https://api.github.com/gists';
-    const method = gistId ? 'PATCH' : 'POST';
-    if (!gistId) {
-      payload.public = false;
-      payload.description = 'CTRL.ai — Task Board';
-    }
-    const res = await fetch(url, {
-      method,
-      headers: { Authorization: 'token ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(res.status);
-    const json = await res.json();
-    if (!gistId) {
-      cfg.set('gist_id', json.id);
-      const el = document.getElementById('cfg-gist-id');
-      if (el) el.value = json.id;
-      showToast('Gist 已创建: ' + json.id.slice(0, 8) + '...');
-    }
-    setSyncState('synced');
-    if (manual) showToast('已同步到 GitHub Gist');
-  } catch (e) {
-    setSyncState('error');
-    if (manual) showToast('同步失败: ' + e.message);
-  }
-}
-
-async function loadFromGist(manual = false) {
-  const token = cfg.get('github_token');
-  const gistId = cfg.get('gist_id');
-  if (!token || !gistId) {
-    if (manual) showToast('请先配置 GitHub Token 和 Gist ID');
-    return;
-  }
-  setSyncState('syncing');
-  try {
-    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-      headers: { Authorization: 'token ' + token }
-    });
-    if (!res.ok) throw new Error(res.status);
-    const json = await res.json();
-    const content = json.files?.['ctrl_tasks.json']?.content;
-    if (content) {
-      taskData = JSON.parse(content);
-      saveTasksToLocal();
-      tbRender();
-      setSyncState('synced');
-      if (manual) showToast('Tasks 已从 Gist 加载');
-    }
-  } catch (e) {
-    setSyncState('error');
-    if (manual) showToast('加载失败: ' + e.message);
-  }
-}
-
-function setSyncState(state) {
-  const badge = document.getElementById('sync-badge');
-  const icon = document.getElementById('sync-icon');
-  const txt = document.getElementById('sync-txt');
-  badge.className = 'sync-badge ' + state;
-  if (state === 'syncing') { icon.textContent = '↻'; txt.textContent = 'Syncing'; }
-  else if (state === 'synced') { icon.textContent = '✓'; txt.textContent = 'Synced'; }
-  else if (state === 'error') { icon.textContent = '✕'; txt.textContent = 'Error'; }
-  else { icon.textContent = '◯'; txt.textContent = 'GitHub'; }
-}
-
-// ══════════════════════════════════════
-// API CALLS
-// ══════════════════════════════════════
-function getApiConfig() {
-  return {
-    endpoint: cfg.get('api_endpoint', '').replace(/\/$/, ''),
-    apiKey: cfg.get('api_key', ''),
-    model: currentModel || cfg.get('default_model', ''),
-  };
-}
-
-function updateApiStatus() {
-  const { endpoint, apiKey } = getApiConfig();
-  const pill = document.getElementById('api-status-pill');
-  const pulse = document.getElementById('api-pulse');
-  const txt = document.getElementById('api-status-txt');
-  if (endpoint && apiKey) {
-    pill.className = 'api-status ok';
-    pulse.className = 'pulse';
-    const domain = endpoint.replace('https://','').replace('http://','').split('/')[0];
-    txt.textContent = domain;
-  } else {
-    pill.className = 'api-status err';
-    pulse.className = 'pulse err';
-    txt.textContent = endpoint ? '缺少 API Key' : '未配置 API';
-  }
-}
-
-async function testApi() {
-  const { endpoint, apiKey, model } = getApiConfig();
-  const resultEl = document.getElementById('api-test-result');
-  if (!endpoint || !apiKey) {
-    resultEl.innerHTML = '<span class="status-tag err">请先填写 Endpoint 和 API Key</span>';
-    return;
-  }
-  resultEl.innerHTML = '<span class="status-tag neutral">Testing...</span>';
-  try {
-    const res = await fetch(endpoint + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
-      body: JSON.stringify({ model: model || 'gpt-3.5-turbo', messages: [{ role: 'user', content: 'Hi' }], max_tokens: 5 }),
-    });
-    if (res.ok) {
-      resultEl.innerHTML = '<span class="status-tag ok">✓ 连接成功 · ' + res.status + '</span>';
-      updateApiStatus();
-    } else {
-      const t = await res.text();
-      resultEl.innerHTML = `<span class="status-tag err">✕ ${res.status} — ${t.slice(0,80)}</span>`;
-    }
-  } catch (e) {
-    resultEl.innerHTML = `<span class="status-tag err">✕ ${e.message}</span>`;
-  }
-}
-
-async function testGithub() {
-  const token = document.getElementById('cfg-gh-token').value.trim() || cfg.get('github_token');
-  const resultEl = document.getElementById('gh-test-result');
-  if (!token) { resultEl.innerHTML = '<span class="status-tag err">请输入 Token</span>'; return; }
-  resultEl.innerHTML = '<span class="status-tag neutral">Testing...</span>';
-  try {
-    const res = await fetch('https://api.github.com/user', { headers: { Authorization: 'token ' + token } });
-    if (res.ok) {
-      const j = await res.json();
-      resultEl.innerHTML = `<span class="status-tag ok">✓ 已连接 @${j.login}</span>`;
-      cfg.set('github_token', token);
-    } else {
-      resultEl.innerHTML = `<span class="status-tag err">✕ ${res.status}</span>`;
-    }
-  } catch (e) {
-    resultEl.innerHTML = `<span class="status-tag err">✕ ${e.message}</span>`;
-  }
-}
-
-async function callAPIStream(messages, onChunk, onDone, onError) {
-  const { endpoint, apiKey, model } = getApiConfig();
-  if (!endpoint || !apiKey) {
-    showToast('请先在 Settings 配置 API Endpoint 和 Key');
-    onError('未配置 API');
-    return;
-  }
-  if (!model) {
-    showToast('请在 Settings 配置模型名称');
-    onError('未配置模型');
-    return;
-  }
-  try {
-    const res = await fetch(endpoint + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
-      body: JSON.stringify({ model, messages, stream: true }),
-    });
-    if (!res.ok) {
-      const t = await res.text();
-      throw new Error(res.status + ': ' + t.slice(0, 120));
-    }
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let full = '';
-    let buffer = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop(); // keep incomplete line
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6).trim();
-        if (data === '[DONE]') continue;
-        try {
-          const j = JSON.parse(data);
-          const delta = j.choices?.[0]?.delta?.content ?? '';
-          if (delta) { full += delta; onChunk(full, delta); }
-          // accumulate usage if available
-          if (j.usage?.total_tokens) totalTokens += j.usage.total_tokens;
-        } catch {}
-      }
-    }
-    onDone(full);
-  } catch (e) {
-    onError(e.message);
-  }
-}
-
-// non-streaming fallback
-async function callAPI(messages) {
-  const { endpoint, apiKey, model } = getApiConfig();
-  const res = await fetch(endpoint + '/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
-    body: JSON.stringify({ model, messages }),
+// ── PAGE NAVIGATION ──
+function showPage(id, btn) {
+  // hide all pages
+  document.querySelectorAll('.page').forEach(p=>{p.style.display='none';p.classList.remove('active');});
+  ['teams','settings'].forEach(n=>{
+    const p=document.getElementById('page-'+n);
+    if(p){p.style.display='none';p.classList.remove('active');}
   });
-  const j = await res.json();
-  return j.choices?.[0]?.message?.content ?? '';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+
+  const pg=document.getElementById('page-'+id);
+  if(!pg)return;
+  if(id==='tasks'){pg.style.display='flex';pg.style.flexDirection='column';}
+  else if(id==='teams'){pg.style.display='grid';}
+  else if(id==='settings'){pg.style.display='block';}
+  else{pg.style.display='flex';pg.style.flexDirection='';}
+  pg.classList.add('active');
+  btn.classList.add('active');
+  if(id==='teams') setTimeout(drawLines,50);
 }
+// init — hide everything except chat
+document.querySelectorAll('.page').forEach(p=>{p.style.display='none';});
+['teams','settings'].forEach(n=>{const p=document.getElementById('page-'+n);if(p)p.style.display='none';});
+const chatPg=document.getElementById('page-chat');
+if(chatPg){chatPg.style.display='flex';chatPg.classList.add('active');}
 
-// ══════════════════════════════════════
-// CHAT UI
-// ══════════════════════════════════════
-function renderAgentSidebar() {
-  const scroll = document.getElementById('agents-scroll');
-  scroll.innerHTML = '';
-  const teams = ['master', 'dev', 'research', 'ops'];
-  for (const team of teams) {
-    const teamAgents = agents.filter(a => a.team === team);
-    if (!teamAgents.length) continue;
-    const tc = TEAM_COLORS[team] || TEAM_COLORS.dev;
-    if (team !== 'master') {
-      const th = document.createElement('div');
-      th.className = 'team-header';
-      th.innerHTML = `<div class="team-stripe" style="background:${tc.color}"></div><div class="team-label" style="color:${tc.color}">${team.toUpperCase()}</div>`;
-      scroll.appendChild(th);
-    }
-    for (const ag of teamAgents) {
-      const el = document.createElement('div');
-      if (team === 'master') {
-        el.className = 'master-sidebar-item' + (ag.id === currentAgentId ? ' active' : '');
-        el.innerHTML = `
-          <div class="master-crown-tag">MASTER</div>
-          <div class="master-avatar">${ag.init}<div class="av-status" style="background:${tc.color};box-shadow:0 0 5px ${tc.color}"></div></div>
-          <div class="master-info"><div class="master-info-name">${ag.name}</div><div class="master-info-sub">${ag.role}</div></div>`;
-      } else {
-        el.className = 'agent-row' + (ag.id === currentAgentId ? ' active' : '');
-        el.style.borderLeftColor = tc.color;
-        el.innerHTML = `
-          <div class="agent-avatar" style="background:rgba(${tc.rgb},.12);color:${tc.color}">${ag.init}<div class="av-status" style="background:${tc.color}"></div></div>
-          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">${ag.name}</div></div><div class="agent-task-preview">${ag.role}</div></div>`;
-      }
-      el.onclick = () => { selectAgent(ag.id); closeMobileSidebar(); };
-      scroll.appendChild(el);
-    }
-  }
-}
-
-function selectAgent(agentId) {
-  currentAgentId = agentId;
-  const ag = agents.find(a => a.id === agentId);
-  if (!ag) return;
-  const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
-
-  // update header
-  const hdrAv = document.getElementById('hdr-av');
-  hdrAv.textContent = ag.init;
-  hdrAv.style.cssText = ag.team === 'master'
-    ? 'background:rgba(200,240,96,.12);border:1px solid rgba(200,240,96,.25);color:var(--accent);font-size:15px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center'
-    : `background:rgba(${tc.rgb},.12);color:${tc.color};width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600`;
-  document.getElementById('hdr-name').textContent = ag.name;
-  document.getElementById('hdr-role').textContent = ag.role;
-  document.getElementById('send-btn').style.background = tc.color;
-  document.getElementById('chat-ta').placeholder = `发消息给 ${ag.name}...`;
-
-  // model
-  currentModel = cfg.get('default_model', '');
-  document.getElementById('hdr-model').textContent = currentModel || '—';
-  renderModelDropdown();
-
-  // update tokens display
-  updateTokensDisplay();
-
-  // render this agent's conversation
-  renderMessages(agentId);
-
-  // sidebar active state
-  renderAgentSidebar();
-}
-
-function renderMessages(agentId) {
+// ── CHAT FILTER ──
+let chatFilter = 'chat';
+function setChatFilter(type, btn) {
+  chatFilter = type;
+  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // hide/show
   const msgs = document.getElementById('chat-msgs');
-  msgs.innerHTML = '';
-  const conv = getConversation(agentId);
-  if (!conv.length) {
-    // welcome note
-    const ag = agents.find(a => a.id === agentId);
-    const note = document.createElement('div');
-    note.className = 'system-note';
-    note.textContent = ag ? `与 ${ag.name} 的新对话 · ${new Date().toLocaleDateString('zh')}` : '新对话';
-    msgs.appendChild(note);
-    return;
-  }
-  const today = new Date().toLocaleDateString('zh', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
-  const sep = document.createElement('div');
-  sep.className = 'date-sep';
-  sep.innerHTML = `<div class="date-line"></div><div class="date-lbl">TODAY · ${today}</div><div class="date-line"></div>`;
-  msgs.appendChild(sep);
-
-  for (const msg of conv) {
-    appendMessage(msg.role, msg.content, msg.time, false);
-  }
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function appendMessage(role, content, time, scroll = true) {
-  const msgs = document.getElementById('chat-msgs');
-  const ag = agents.find(a => a.id === currentAgentId);
-  const tc = ag ? (TEAM_COLORS[ag.team] || TEAM_COLORS.dev) : TEAM_COLORS.master;
-  const t = time || new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
-  const g = document.createElement('div');
-  g.className = 'msg-group from-' + role;
-
-  if (role === 'user') {
-    g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="background:rgba(255,255,255,.06);color:var(--text2)">你</div><div class="msg-time">${t}</div></div><div class="bubble from-user"></div>`;
-    g.querySelector('.bubble').textContent = content;
-  } else {
-    const avS = ag?.team === 'master'
-      ? 'background:rgba(200,240,96,.1);color:var(--accent)'
-      : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
-    g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag?.init || 'AI'}</div><div class="msg-sender">${ag?.name || 'AI'}</div><div class="msg-time">${t}</div></div><div class="bubble from-agent"></div>`;
-    // render markdown-light
-    g.querySelector('.bubble').innerHTML = renderMd(content);
-  }
-  msgs.appendChild(g);
-  if (scroll) msgs.scrollTop = msgs.scrollHeight;
-  return g;
-}
-
-// very simple markdown: bold, code, code blocks
-function renderMd(text) {
-  text = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre>${code}</pre>`)
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br>');
-  return text;
-}
-
-function showTypingIndicator() {
-  const msgs = document.getElementById('chat-msgs');
-  const ag = agents.find(a => a.id === currentAgentId);
-  const tc = ag ? (TEAM_COLORS[ag.team] || TEAM_COLORS.dev) : TEAM_COLORS.master;
-  const avS = ag?.team === 'master'
-    ? 'background:rgba(200,240,96,.1);color:var(--accent)'
-    : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
-  const g = document.createElement('div');
-  g.className = 'msg-group from-agent';
-  g.id = 'typing-indicator';
-  g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag?.init || 'AI'}</div><div class="msg-sender">${ag?.name || 'AI'}</div></div><div class="typing-bub"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
-  msgs.appendChild(g);
-  msgs.scrollTop = msgs.scrollHeight;
-  return g;
-}
-
-function removeTypingIndicator() {
-  const el = document.getElementById('typing-indicator');
-  if (el) el.remove();
-}
-
-async function sendMsg() {
-  if (isSending) return;
-  if (!currentAgentId) { showToast('请先选择一个 Agent'); return; }
-  const ta = document.getElementById('chat-ta');
-  const text = ta.value.trim();
-  if (!text) return;
-
-  const ag = agents.find(a => a.id === currentAgentId);
-  const now = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
-  const conv = getConversation(currentAgentId);
-
-  // add user message
-  conv.push({ role: 'user', content: text, time: now });
-  appendMessage('user', text, now);
-  ta.value = ''; ta.style.height = 'auto';
-
-  // disable send
-  isSending = true;
-  const btn = document.getElementById('send-btn');
-  btn.disabled = true;
-
-  // build messages for API (system + history)
-  const apiMessages = [
-    { role: 'system', content: ag.system },
-    ...conv.slice(-20).map(m => ({ role: m.role, content: m.content })), // last 20 turns
-  ];
-
-  // remove last item (just added) since we'll append assistant response
-  // actually we want to send user msg, so keep it
-  // typing indicator
-  const typingEl = showTypingIndicator();
-
-  // build streaming response bubble
-  let responseBubble = null;
-  let responseGroup = null;
-  const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
-  const avS = ag.team === 'master'
-    ? 'background:rgba(200,240,96,.1);color:var(--accent)'
-    : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
-  const respNow = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
-
-  callAPIStream(
-    apiMessages,
-    (full, delta) => {
-      // first chunk: replace typing indicator with real bubble
-      if (!responseBubble) {
-        removeTypingIndicator();
-        const g = document.createElement('div');
-        g.className = 'msg-group from-agent';
-        g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag.init}</div><div class="msg-sender">${ag.name}</div><div class="msg-time">${respNow}</div></div><div class="bubble from-agent streaming-cursor"></div>`;
-        document.getElementById('chat-msgs').appendChild(g);
-        responseBubble = g.querySelector('.bubble');
-        responseGroup = g;
-        document.getElementById('chat-msgs').scrollTop = 999999;
-      }
-      responseBubble.innerHTML = renderMd(full);
-      document.getElementById('chat-msgs').scrollTop = 999999;
-    },
-    (full) => {
-      // done
-      if (responseBubble) responseBubble.classList.remove('streaming-cursor');
-      conv.push({ role: 'assistant', content: full, time: respNow });
-      isSending = false;
-      btn.disabled = false;
-      updateTokensDisplay();
-    },
-    (err) => {
-      removeTypingIndicator();
-      if (responseBubble) { responseBubble.classList.remove('streaming-cursor'); }
-      // show error
-      const errEl = document.createElement('div');
-      errEl.className = 'system-note';
-      errEl.style.color = 'var(--research)';
-      errEl.style.borderColor = 'rgba(240,96,128,.2)';
-      errEl.textContent = '✕ API 错误: ' + err;
-      document.getElementById('chat-msgs').appendChild(errEl);
-      // remove last user msg from conv on error? keep it for retry
-      isSending = false;
-      btn.disabled = false;
-    }
-  );
-}
-
-function handleChatKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
-}
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
-
-function clearCurrentChat() {
-  if (!currentAgentId) return;
-  if (!confirm('清空与该 Agent 的对话历史？')) return;
-  conversations[currentAgentId] = [];
-  renderMessages(currentAgentId);
-}
-
-function updateTokensDisplay() {
-  document.getElementById('hdr-tokens').textContent = totalTokens > 0 ? totalTokens + ' tokens' : '—';
-}
-
-function filterAgents(q) {
-  const rows = document.querySelectorAll('#agents-scroll .agent-row, #agents-scroll .master-sidebar-item');
-  rows.forEach(r => {
-    const name = r.querySelector('.agent-name, .master-info-name')?.textContent.toLowerCase() || '';
-    r.style.display = (!q || name.includes(q.toLowerCase())) ? '' : 'none';
+  ['lib-files','lib-images','lib-links','lib-code'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
   });
-}
-
-// ══════════════════════════════════════
-// MODEL DROPDOWN
-// ══════════════════════════════════════
-function renderModelDropdown() {
-  const dd = document.getElementById('model-dd');
-  const defaultM = cfg.get('default_model', '');
-  const extraStr = cfg.get('models_extra', '');
-  const extra = extraStr ? extraStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-  const allModels = defaultM ? [defaultM, ...extra.filter(m => m !== defaultM)] : extra;
-
-  if (!allModels.length) {
-    dd.innerHTML = '<div style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--text3)">在 Settings 中配置模型</div>';
-    return;
+  if(type==='chat'){
+    msgs.style.display='flex';
+  } else {
+    msgs.style.display='none';
+    const libId = {files:'lib-files',images:'lib-images',links:'lib-links',code:'lib-code'}[type];
+    if(libId && document.getElementById(libId)) document.getElementById(libId).classList.add('active');
   }
-  if (!currentModel && defaultM) currentModel = defaultM;
-  dd.innerHTML = allModels.map(m => `
-    <div class="model-opt ${m === currentModel ? 'selected' : ''}" onclick="setModelChoice('${m}',event)">
-      ${m === currentModel ? '<span class="model-chk">✓</span>' : ''}
-      <div class="model-opt-name">${m}</div>
-    </div>`).join('');
 }
 
-function toggleMDD(e) {
-  e.stopPropagation();
-  document.getElementById('model-dd').classList.toggle('open');
+// ── AGENT SELECT ──
+const teams={master:{color:'var(--music)',rgb:'200,240,96',label:'Master'},dev:{color:'var(--dev)',rgb:'96,184,240',label:'Dev'},research:{color:'var(--research)',rgb:'240,96,128',label:'Research'},ops:{color:'var(--ops)',rgb:'240,168,64',label:'Ops'},music:{color:'var(--music)',rgb:'200,240,96',label:'Music'}};
+const statusColors={running:'var(--music)',waiting:'var(--ops)',idle:'var(--dev)',offline:'var(--text3)'};
+let curAgent={name:'CTRL-Prime',team:'master',status:'running',init:'🧠'};
+
+function selAgent(row,init,name,role,team,model,status){
+  document.querySelectorAll('.agent-row,.master-sidebar-item').forEach(r=>r.classList.remove('active'));
+  row.classList.add('active');
+  curAgent={name,team,status,init};
+  const t=teams[team]||teams.dev;
+  const sc=statusColors[status];
+  const av=document.getElementById('hdr-av');
+  av.textContent=init;
+  av.style.cssText=team==='master'?`background:rgba(200,240,96,.12);border:1px solid rgba(200,240,96,.25);color:var(--music);font-size:15px`:`background:rgba(${t.rgb},.12);color:${t.color}`;
+  document.getElementById('hdr-name').textContent=name;
+  document.getElementById('hdr-role').textContent=role;
+  document.getElementById('hdr-team').textContent=t.label+(team!=='master'?' Team':'');
+  document.getElementById('hdr-team').style.color=t.color;
+  const dot=document.getElementById('hdr-dot');
+  dot.style.background=sc;dot.style.boxShadow=sc!=='var(--text3)'?`0 0 5px ${sc}`:'none';
+  document.getElementById('hdr-model').textContent=model;
+  document.getElementById('send-btn').style.background=t.color;
+  document.getElementById('chat-ta').placeholder=`发消息给 ${name}...`;
 }
-function setModelChoice(name, e) {
+
+// ── SEND MSG ──
+function sendMsg(){
+  const ta=document.getElementById('chat-ta');
+  const text=ta.value.trim();if(!text)return;
+  const c=document.getElementById('chat-msgs');
+  const tg=document.getElementById('typing-g');if(tg)tg.remove();
+  const now=new Date().toLocaleTimeString('zh',{hour:'2-digit',minute:'2-digit'});
+  const t=teams[curAgent.team]||teams.dev;
+  const g=document.createElement('div');g.className='msg-group from-user';
+  g.innerHTML=`<div class="msg-meta"><div class="msg-av" style="background:rgba(255,255,255,.06);color:var(--text2)">你</div><div class="msg-time">${now}</div></div><div class="bubble from-user">${text}</div>`;
+  c.appendChild(g);ta.value='';ta.style.height='auto';c.scrollTop=c.scrollHeight;
+  setTimeout(()=>{
+    const tg2=document.createElement('div');tg2.className='msg-group from-agent';tg2.id='typing-g';
+    const avS=curAgent.team==='master'?`background:rgba(200,240,96,.1);color:var(--music)`:`background:rgba(${t.rgb},.12);color:${t.color}`;
+    tg2.innerHTML=`<div class="msg-meta"><div class="msg-av" style="${avS}">${curAgent.init}</div><div class="msg-sender">${curAgent.name}</div></div><div class="typing-bub"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
+    c.appendChild(tg2);c.scrollTop=c.scrollHeight;
+  },400);
+}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+
+// ── MODEL DROPDOWN ──
+function toggleMDD(e){e.stopPropagation();document.getElementById('model-dd').classList.toggle('open');}
+function setModel(name,e){
   e.stopPropagation();
-  currentModel = name;
-  document.getElementById('hdr-model').textContent = name;
-  renderModelDropdown();
+  document.getElementById('hdr-model').textContent=name;
+  document.querySelectorAll('.model-opt').forEach(o=>{o.classList.remove('selected');const c=o.querySelector('.model-chk');if(c)c.remove();if(o.querySelector('.model-opt-name').textContent===name){o.classList.add('selected');const chk=document.createElement('span');chk.className='model-chk';chk.textContent='✓';o.prepend(chk);}});
   document.getElementById('model-dd').classList.remove('open');
 }
-document.addEventListener('click', () => document.getElementById('model-dd')?.classList.remove('open'));
+document.addEventListener('click',()=>document.getElementById('model-dd').classList.remove('open'));
 
-// ══════════════════════════════════════
-// TASKS
-// ══════════════════════════════════════
-const TEAM_TAG = { master:'tag-master', dev:'tag-dev', research:'tag-research', ops:'tag-ops' };
-const TEAM_LABEL = { master:'Master', dev:'Dev', research:'Research', ops:'Ops' };
-const PRIORITY_COLORS = { low:'var(--text3)', mid:'var(--dev)', high:'var(--ops)', urgent:'var(--research)' };
+// ── CANVAS PAN & ZOOM ──
+let scale=1,panX=40,panY=20,isPanning=false,startX=0,startY=0,startPanX=0,startPanY=0;
 
-function tbRender() {
-  const cols = { todo: [], progress: [], review: [], done: [] };
-  for (const t of taskData) {
-    if (tbFilterTeam !== 'all' && t.team !== tbFilterTeam) continue;
-    if (cols[t.col]) cols[t.col].push(t);
-  }
-
-  for (const [colId, tasks] of Object.entries(cols)) {
-    const body = document.getElementById('body-' + colId);
-    const cnt = document.getElementById('cnt-' + colId);
-    if (!body) continue;
-    cnt.textContent = tasks.length;
-    body.innerHTML = '';
-    for (const t of tasks) body.appendChild(renderTaskCard(t, colId));
-  }
-
-  const total = taskData.length;
-  const inProg = taskData.filter(t => t.col === 'progress').length;
-  document.getElementById('tb-meta').textContent = `${total} tasks · ${inProg} in progress`;
+function applyTransform(){
+  document.getElementById('canvas-world').style.transform=`translate(${panX}px,${panY}px) scale(${scale})`;
+  document.getElementById('zoom-label').textContent=Math.round(scale*100)+'%';
+  drawLines();
 }
 
-function renderTaskCard(t, col) {
-  const card = document.createElement('div');
-  card.className = 'task-card';
-  const tagCls = TEAM_TAG[t.team] || 'tag-dev';
-  const pColor = PRIORITY_COLORS[t.priority] || 'var(--text3)';
-
-  let extra = '';
-  if (col === 'progress' && t.progress > 0) {
-    extra = `<div class="card-progress"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Progress</span><span style="font-family:var(--mono);font-size:9px;color:var(--accent)">${Math.round(t.progress)}%</span></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${t.progress}%"></div></div></div>`;
+const cp=document.getElementById('canvas-panel');
+cp.addEventListener('mousedown',e=>{
+  if(e.target===cp||e.target.id==='canvas-svg'||e.target.tagName==='svg'||e.target.classList.contains('canvas-world')){
+    isPanning=true;startX=e.clientX;startY=e.clientY;startPanX=panX;startPanY=panY;e.preventDefault();
   }
-  if (col === 'review' && t.result) {
-    extra += `<div class="card-result">${t.result}</div>`;
+});
+document.addEventListener('mousemove',e=>{
+  if(!isPanning)return;
+  panX=startPanX+(e.clientX-startX);panY=startPanY+(e.clientY-startY);
+  // clamp
+  panX=Math.max(-800,Math.min(400,panX));panY=Math.max(-400,Math.min(300,panY));
+  applyTransform();
+});
+document.addEventListener('mouseup',()=>isPanning=false);
+
+cp.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const delta=e.deltaY>0?-0.1:0.1;
+  scale=Math.max(0.4,Math.min(2,scale+delta));
+  applyTransform();
+},{passive:false});
+
+function zoomIn(){scale=Math.min(2,scale+0.15);applyTransform();}
+function zoomOut(){scale=Math.max(0.4,scale-0.15);applyTransform();}
+function resetView(){scale=1;panX=40;panY=20;applyTransform();}
+
+// ── DRAW CONNECTOR LINES ──
+function getNodeCenter(id){
+  const el=document.getElementById(id);
+  if(!el)return null;
+  const s=parseFloat(el.style.left||0);
+  const t=parseFloat(el.style.top||0);
+  const w=el.offsetWidth;const h=el.offsetHeight;
+  return{x:(s+w/2)*scale+panX,y:(t+h/2)*scale+panY,bot:(t+h)*scale+panY,top:t*scale+panY,left:s*scale+panX,right:(s+w)*scale+panX};
+}
+
+const connections=[
+  ['cn-master','cn-dev'],['cn-master','cn-research'],['cn-master','cn-ops'],['cn-master','cn-music'],
+  ['cn-dev','cn-cj'],['cn-dev','cn-fl'],
+  ['cn-research','cn-re'],
+  ['cn-ops','cn-em'],['cn-ops','cn-ca'],
+  ['cn-music','cn-mu'],
+];
+
+function drawLines(){
+  const svg=document.getElementById('canvas-svg');
+  svg.innerHTML='';
+  connections.forEach(([a,b])=>{
+    const na=getNodeCenter(a);const nb=getNodeCenter(b);
+    if(!na||!nb)return;
+    const x1=na.x;const y1=na.bot;const x2=nb.x;const y2=nb.top;
+    const cy=(y1+y2)/2;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke','rgba(255,255,255,0.07)');
+    path.setAttribute('stroke-width','1.5');
+    svg.appendChild(path);
+  });
+}
+
+setTimeout(()=>{applyTransform();},100);
+
+// ── TREE NODE SELECT ──
+const nodeData={
+  master:{name:'CTRL-Prime',role:'Master Orchestrator',av:'🧠',avStyle:'background:rgba(200,240,96,.12);border:1px solid rgba(200,240,96,.25);color:var(--music)',status:'ACTIVE',sc:'var(--music)',task:'协调 v1.2.3 发布流程',from:'你（用户）',goal:'发布 CleverJazz v1.2.3 到 App Store',model:'claude-opus-4'},
+  cj:{name:'CleverJazz',role:'Music App Dev',av:'CJ',avStyle:'background:rgba(96,184,240,.12);color:var(--dev)',status:'RUNNING',sc:'var(--music)',task:'TestFlight 上传 (89%)',from:'CTRL-Prime → Dev',goal:'完成上传并通知 Master',model:'claude-sonnet-4'},
+  flutter:{name:'Flutter-CI',role:'Build Agent',av:'FL',avStyle:'background:rgba(96,184,240,.12);color:var(--dev)',status:'RUNNING',sc:'var(--music)',task:'flutter build ipa · 89%',from:'CleverJazz',goal:'输出 .ipa 文件',model:'claude-haiku-4'},
+  research:{name:'Research',role:'Market Research',av:'RE',avStyle:'background:rgba(240,96,128,.12);color:var(--research)',status:'IDLE',sc:'var(--dev)',task:'等待下一个任务',from:'CTRL-Prime',goal:'分析竞品定价策略',model:'claude-sonnet-4'},
+  email:{name:'Email',role:'Inbox Manager',av:'EM',avStyle:'background:rgba(240,168,64,.12);color:var(--ops)',status:'IDLE',sc:'var(--dev)',task:'收件箱已清理',from:'CTRL-Prime',goal:'保持收件箱清洁',model:'claude-haiku-4'},
+  calendar:{name:'Calendar',role:'Schedule Agent',av:'CA',avStyle:'background:rgba(240,168,64,.12);color:var(--ops)',status:'WAITING',sc:'var(--ops)',task:'等待发布日期确认',from:'CTRL-Prime',goal:'创建发布日历事件',model:'claude-haiku-4'},
+  music:{name:'Music-Tutor',role:'Music Content',av:'MU',avStyle:'background:rgba(200,240,96,.07);color:var(--music)',status:'IDLE',sc:'var(--text3)',task:'待机',from:'CTRL-Prime',goal:'等待音乐内容任务',model:'claude-sonnet-4'},
+};
+
+function selTreeNode(key,e){
+  if(e)e.stopPropagation();
+  document.querySelectorAll('.cn-agent,.cn-team,.cn-master').forEach(n=>n.classList.remove('node-selected'));
+  const el=document.getElementById('cn-'+key)||document.getElementById('cn-master');
+  if(el)el.classList.add('node-selected');
+  const d=nodeData[key];
+  const card=document.getElementById('td-card');
+  if(!d){card.innerHTML='<div class="td-empty">← 点击节点查看详情</div>';return;}
+  card.innerHTML=`
+    <div class="td-top">
+      <div class="td-av" style="${d.avStyle}">${d.av}</div>
+      <div><div class="td-name">${d.name}</div><div class="td-role">${d.role}</div></div>
+      <div class="td-badge" style="background:rgba(0,0,0,.2);border-color:${d.sc};color:${d.sc}">${d.status}</div>
+    </div>
+    <div class="td-rows">
+      <div class="td-row"><div class="td-lbl">TASK</div><div class="td-val">${d.task}</div></div>
+      <div class="td-row"><div class="td-lbl">FROM</div><div class="td-val" style="color:${d.sc}">${d.from}</div></div>
+      <div class="td-row"><div class="td-lbl">GOAL</div><div class="td-val">${d.goal}</div></div>
+      <div class="td-row"><div class="td-lbl">MODEL</div><div class="td-val" style="font-family:var(--mono);font-size:11px">${d.model}</div></div>
+    </div>`;
+}
+
+// ── LOGS ──
+const logs=[
+  {type:'task',time:'Now',icon:'⚡',ac:'var(--music)',agent:'Flutter-CI',msg:'build ipa 编译进度 89%',tc:'lt-task',tt:'TASK'},
+  {type:'task',time:'09:18',icon:'📤',ac:'var(--dev)',agent:'CleverJazz',msg:'TestFlight 上传开始 28.4 MB',tc:'lt-task',tt:'TASK'},
+  {type:'agent',time:'09:16',icon:'🧠',ac:'var(--music)',agent:'CTRL-Prime',msg:'分配 [TestFlight] → CleverJazz',tc:'lt-info',tt:'ASSIGN'},
+  {type:'agent',time:'09:15',icon:'💬',ac:'var(--music)',agent:'CTRL-Prime',msg:'收到指令：优先上传 TestFlight',tc:'lt-info',tt:'CMD'},
+  {type:'task',time:'09:10',icon:'✅',ac:'var(--dev)',agent:'CleverJazz',msg:'隐私政策页面更新完成',tc:'lt-done',tt:'DONE'},
+  {type:'agent',time:'09:00',icon:'🟢',ac:'var(--music)',agent:'CTRL-Prime',msg:'系统启动，5 个 Agent 上线',tc:'lt-info',tt:'SYS'},
+  {type:'task',time:'昨天',icon:'✅',ac:'var(--research)',agent:'Research',msg:'竞品评论抓取完成 300条',tc:'lt-done',tt:'DONE'},
+  {type:'error',time:'昨天',icon:'❌',ac:'var(--dev)',agent:'CleverJazz',msg:'截图上传失败，已重试',tc:'lt-error',tt:'ERROR'},
+];
+let logFilter='all';
+function renderLogs(){
+  const list=document.getElementById('td-log-list');
+  const f=logFilter==='all'?logs:logs.filter(l=>l.type===logFilter);
+  list.innerHTML=f.map(l=>`<div class="log-entry"><div class="log-time">${l.time}</div><div class="log-icon">${l.icon}</div><div class="log-body"><div class="log-agent" style="color:${l.ac}">${l.agent}</div><div class="log-msg">${l.msg}<span class="log-tag ${l.tc}">${l.tt}</span></div></div></div>`).join('');
+}
+function filterLog(t,btn){logFilter=t;document.querySelectorAll('.lf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderLogs();}
+function clearLog(){logs.length=0;renderLogs();}
+
+// ── ACTIVITY ──
+const activities=[
+  {type:'task',time:'Now',title:'TestFlight 上传中 (89%)',team:'dev',agent:'CleverJazz',status:'running'},
+  {type:'chat',time:'09:18',title:'发送指令：优先上传 TestFlight',team:'master',agent:'CTRL-Prime',status:'running'},
+  {type:'task',time:'09:10',title:'隐私政策页面更新完成',team:'dev',agent:'CleverJazz',status:'idle'},
+  {type:'chat',time:'09:05',title:'Calendar 待命',team:'ops',agent:'Calendar',status:'waiting'},
+  {type:'task',time:'09:00',title:'收件箱清理完成',team:'ops',agent:'Email',status:'idle'},
+  {type:'task',time:'昨天',title:'竞品评论抓取 300条',team:'research',agent:'Research',status:'idle'},
+  {type:'error',time:'昨天',title:'App Store 截图上传失败',team:'dev',agent:'CleverJazz',status:'idle'},
+];
+const stC={running:{bg:'rgba(200,240,96,.1)',c:'var(--music)'},waiting:{bg:'rgba(240,168,64,.1)',c:'var(--ops)'},idle:{bg:'rgba(96,184,240,.1)',c:'var(--dev)'},offline:{bg:'rgba(90,88,104,.15)',c:'var(--text3)'}};
+const tBar={task:'var(--dev)',chat:'var(--music)',error:'var(--research)'};
+let actFilter='all';
+function renderAct(){
+  const list=document.getElementById('rp-list');if(!list)return;
+  const f=actFilter==='all'?activities:activities.filter(a=>a.type===actFilter);
+  list.innerHTML=f.map(a=>{
+    const t=teams[a.team]||teams.dev;const sc=stC[a.status]||stC.idle;const bar=tBar[a.type]||'var(--dev)';
+    return`<div class="rp-item"><div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:${bar};border-radius:0 2px 2px 0"></div><div class="rp-item-top"><div class="rp-item-title">${a.title}</div><div class="rp-item-time">${a.time}</div></div><div class="rp-item-footer"><div class="rp-chip" style="background:rgba(${t.rgb},.08);border-color:rgba(${t.rgb},.2);color:${t.color}"><div style="width:5px;height:5px;border-radius:50%;background:${t.color}"></div>${t.label}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${a.agent}</div><div class="rp-tag" style="background:${sc.bg};color:${sc.c}">${a.status.toUpperCase()}</div></div></div>`;
+  }).join('');
+}
+function filterAct(t,btn){actFilter=t;document.querySelectorAll('.rf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAct();}
+
+// ── MODAL ──
+let modalTarget='master';
+function openAddModal(target){
+  modalTarget=target;
+  document.getElementById('modal').classList.add('open');
+  document.querySelectorAll('.modal-opt').forEach((o,i)=>{
+    o.classList.remove('selected');
+    const targets=['master','dev','research','ops'];
+    if(targets[i]===target)o.classList.add('selected');
+  });
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function selModalOpt(el,target){
+  document.querySelectorAll('.modal-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');modalTarget=target;
+}
+function confirmAddAgent(){
+  const name=document.getElementById('modal-name').value.trim()||'New-Agent';
+  alert(`已添加 Agent「${name}」到 ${modalTarget} team！\n（实际开发时会动态更新地图）`);
+  closeModal();
+  document.getElementById('modal-name').value='';
+}
+
+// ── TASKS SYSTEM ──
+const teamColors2={dev:'var(--dev)',research:'var(--research)',ops:'var(--ops)',music:'var(--music)'};
+const teamRgb2={dev:'96,184,240',research:'240,96,128',ops:'240,168,64',music:'200,240,96'};
+const teamAgents2={dev:'CleverJazz',research:'Research',ops:'Email',music:'Music-Tutor'};
+const teamLabels2={dev:'DEV',research:'RESEARCH',ops:'OPS',music:'MUSIC'};
+
+let taskData=[
+  {id:1,col:'todo',title:'用户音阶练习历史记录',desc:'记录用户每天的练习内容和时长，支持查看历史趋势。',team:'dev',priority:'mid',agent:null,progress:0,createdAt:'10:30',thoughts:[],result:null},
+  {id:2,col:'todo',title:'竞品分析：Yousician 定价策略',desc:'分析 Yousician 的订阅定价层级，对比我们的定位。',team:'research',priority:'high',agent:null,progress:0,createdAt:'09:50',thoughts:[],result:null},
+  {id:3,col:'todo',title:'Apple 账号续费提醒',desc:'Apple Developer 账号将于下月到期，提前设置提醒。',team:'ops',priority:'low',agent:null,progress:0,createdAt:'昨天',thoughts:[],result:null},
+  {id:4,col:'progress',title:'TestFlight 构建上传 v1.2.3',desc:'打包 release 版本并上传到 TestFlight 供内测。',team:'dev',priority:'high',agent:'CleverJazz',progress:89,createdAt:'09:15',
+   thoughts:[{text:'读取 pubspec.yaml，确认版本号 1.2.3+8',done:true},{text:'执行 flutter build ipa --release',done:true},{text:'构建完成，28.4 MB，校验 MD5',done:true},{text:'通过 altool 上传到 App Store Connect',done:true},{text:'等待服务器处理，当前进度 89%...',done:false}],result:null},
+  {id:5,col:'progress',title:'Circle of Fifths 动画优化',desc:'优化 Circle of Fifths 组件的旋转动画流畅度。',team:'dev',priority:'mid',agent:'CleverJazz',progress:45,createdAt:'09:00',
+   thoughts:[{text:'分析当前动画：AnimationController + CustomPainter',done:true},{text:'发现问题：setState 调用频率过高',done:true},{text:'尝试方案：改用 RepaintBoundary 隔离重绘...',done:false}],result:null},
+  {id:6,col:'review',title:'App Store 截图适配 iPhone 16',desc:'重新生成所有 App Store 截图，适配 iPhone 16 Pro。',team:'ops',priority:'high',agent:'CleverJazz',progress:100,createdAt:'昨天',
+   thoughts:[{text:'获取 iPhone 16 Pro 屏幕规格：1320×2868px',done:true},{text:'更新 Fastlane 截图配置文件',done:true},{text:'在模拟器中运行截图生成脚本，共 5 张',done:true},{text:'截图生成完毕，已上传',done:true}],
+   result:'已生成 5 张 iPhone 16 Pro (6.3") 截图，分辨率 1320×2868px，已上传至 App Store Connect。文件名：screenshot_1.png ～ screenshot_5.png，总大小 12.8 MB。所有截图均通过 Apple 格式校验，可直接提交审核。'},
+  {id:7,col:'done',title:'隐私政策页面更新',desc:'',team:'ops',priority:'low',agent:'CleverJazz',progress:100,createdAt:'昨天',thoughts:[],result:'已更新隐私政策页面，符合 App Store 最新要求。'},
+  {id:8,col:'done',title:'Supabase schema 设计',desc:'',team:'dev',priority:'mid',agent:'CleverJazz',progress:100,createdAt:'昨天',thoughts:[],result:'Schema 设计完成，包含 users、practice_sessions、scales 三张表。'},
+  {id:9,col:'done',title:'竞品评论抓取 300条',desc:'',team:'research',priority:'mid',agent:'Research',progress:100,createdAt:'2天前',thoughts:[],result:'从 App Store 抓取竞品评论各 100 条，已整理成 Excel。'},
+  {id:10,col:'done',title:'每日邮件摘要设置',desc:'',team:'ops',priority:'low',agent:'Email',progress:100,createdAt:'2天前',thoughts:[],result:'已配置每日 09:00 发送邮件摘要。'},
+];
+let tbFilterTeam='all';
+let selectedTaskId=null;
+let ntTeam='dev';
+let ntPriority='mid';
+
+function tbRender(){
+  const cols={todo:[],progress:[],review:[],done:[]};
+  taskData.filter(t=>tbFilterTeam==='all'||t.team===tbFilterTeam).forEach(t=>cols[t.col].push(t));
+  ['todo','progress','review','done'].forEach(col=>{
+    const body=document.getElementById('body-'+col);
+    if(!body)return;
+    body.innerHTML='';
+    cols[col].forEach(t=>body.appendChild(tbMakeCard(t)));
+    document.getElementById('cnt-'+col).textContent=cols[col].length;
+  });
+  const prog=taskData.filter(t=>t.col==='progress').length;
+  const meta=document.getElementById('tb-meta');
+  if(meta)meta.textContent=`${taskData.length} tasks · ${prog} in progress`;
+}
+
+function tbMakeCard(t){
+  const card=document.createElement('div');
+  const tc=teamColors2[t.team];
+  const tagClass='tag-'+t.team;
+  const pColor={low:'var(--text3)',mid:'var(--ops)',high:'var(--research)'}[t.priority];
+  const isDone=t.col==='done';
+  card.style.cssText=`background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .18s;position:relative;${isDone?'opacity:.55':''}`;
+  card.onmouseenter=()=>{if(!isDone){card.style.borderColor='var(--border2)';card.style.transform='translateY(-1px)';card.style.boxShadow='0 4px 20px rgba(0,0,0,.25)';}};
+  card.onmouseleave=()=>{card.style.borderColor='var(--border)';card.style.transform='';card.style.boxShadow='';};
+
+  let h=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+    ${isDone?'<span style="font-size:13px;flex-shrink:0;margin-top:2px">✅</span>':''}
+    <div style="font-size:12px;font-weight:500;color:var(--text);line-height:1.5;flex:1">${t.title}</div>
+    <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;background:${pColor}"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="c-tag ${tagClass}">${teamLabels2[t.team]}</div>
+    ${t.agent?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);display:flex;align-items:center;gap:4px"><div style="width:5px;height:5px;border-radius:50%;background:${tc}"></div>${t.agent}</div>`:''}
+  </div>`;
+
+  if(t.col==='progress'){
+    const bc=t.progress<50?'var(--ops)':t.progress<90?'var(--dev)':'var(--music)';
+    const latest=t.thoughts.filter(th=>!th.done)[0]||t.thoughts[t.thoughts.length-1];
+    h+=`<div style="margin-bottom:8px">
+      <div style="height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;margin-bottom:3px"><div style="height:100%;width:${t.progress}%;border-radius:2px;background:${bc};transition:width .5s"></div></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${t.progress}% · ${t.thoughts.filter(th=>th.done).length}/${t.thoughts.length} steps</div>
+    </div>`;
+    if(latest) h+=`<div style="background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;margin-bottom:8px;font-size:11px;color:var(--text3);line-height:1.5;font-style:italic"><div style="font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;font-style:normal">🧠 Thinking</div>${latest.text}</div>`;
+  }
+  if(t.col==='review'&&t.result){
+    h+=`<div style="background:rgba(200,240,96,.04);border:1px solid rgba(200,240,96,.15);border-radius:6px;padding:7px 9px;margin-bottom:8px;font-size:11px;color:var(--text2);line-height:1.5"><div style="font-family:var(--mono);font-size:8px;color:var(--music);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px">✨ Result Ready</div>${t.result.substring(0,90)}...</div>`;
   }
 
-  // action buttons
-  let actions = '';
-  if (col === 'todo') actions = `<button class="card-btn primary" onclick="moveTask(${t.id},'progress');event.stopPropagation()">▶ 开始</button><button class="card-btn" onclick="deleteTask(${t.id});event.stopPropagation()">删除</button>`;
-  if (col === 'progress') actions = `<button class="card-btn" onclick="moveTask(${t.id},'review');event.stopPropagation()">→ Review</button>`;
-  if (col === 'review') actions = `<button class="card-btn primary" onclick="moveTask(${t.id},'done');event.stopPropagation()">✓ Done</button><button class="card-btn" onclick="moveTask(${t.id},'progress');event.stopPropagation()">← 返回</button>`;
-  if (col === 'done') actions = `<button class="card-btn" onclick="deleteTask(${t.id});event.stopPropagation()">归档删除</button>`;
-
-  card.innerHTML = `
-    <div class="card-top">
-      <div class="card-title">${escHtml(t.title)}</div>
-      <div style="width:6px;height:6px;border-radius:50%;background:${pColor};flex-shrink:0;margin-top:4px"></div>
-    </div>
-    <div class="card-meta">
-      <span class="card-tag ${tagCls}">${TEAM_LABEL[t.team] || t.team}</span>
-      ${t.desc ? `<span style="font-size:10px;color:var(--text3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:120px">${escHtml(t.desc.slice(0,40))}</span>` : ''}
-      <span class="card-time">${t.createdAt || ''}</span>
-    </div>
-    ${extra}
-    <div class="card-actions">${actions}</div>`;
+  h+=`<div style="display:flex;align-items:center;gap:6px"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${t.createdAt}</div>`;
+  if(t.col==='todo'){
+    h+=`<button onclick="tbStart(${t.id},event)" style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;margin-left:auto">▶ Start</button>`;
+  }else if(t.col==='progress'){
+    h+=`<button onclick="tbStop(${t.id},event)" style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;background:rgba(240,96,128,.1);color:var(--research);border:1px solid rgba(240,96,128,.2);border-radius:6px;padding:5px 10px;cursor:pointer;margin-left:auto">■ Stop</button>`;
+  }else if(t.col==='review'){
+    h+=`<button onclick="tbReject(${t.id},event)" style="font-family:var(--mono);font-size:10px;background:rgba(240,168,64,.1);color:var(--ops);border:1px solid rgba(240,168,64,.2);border-radius:6px;padding:5px 10px;cursor:pointer;margin-left:auto">↩ Redo</button>
+        <button onclick="tbDone(${t.id},event)" style="font-family:var(--mono);font-size:10px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:6px;padding:5px 12px;cursor:pointer">✓ Done</button>`;
+  }
+  h+=`</div>`;
+  card.innerHTML=h;
+  card.addEventListener('click',()=>tbOpenDrawer(t.id));
   return card;
 }
 
-function moveTask(id, toCol) {
-  const t = taskData.find(x => x.id === id);
-  if (!t) return;
-  t.col = toCol;
-  if (toCol === 'progress' && !t.progress) t.progress = 0;
-  if (toCol === 'review' && !t.result) t.result = `任务已完成，请审阅。`;
-  saveTasksToLocal();
-  scheduleSave();
-  tbRender();
-  showToast(`已移动到 ${toCol === 'progress' ? 'In Progress' : toCol === 'review' ? 'Review' : 'Done'}`);
+function tbStart(id,e){
+  e.stopPropagation();
+  const t=taskData.find(t=>t.id===id);if(!t)return;
+  t.col='progress';t.agent=teamAgents2[t.team];t.progress=0;
+  tbRender();showToast(`▶ 已分配给 ${t.agent}，开始执行`);
+}
+function tbStop(id,e){
+  e.stopPropagation();
+  const t=taskData.find(t=>t.id===id);if(!t)return;
+  t.col='todo';t.agent=null;t.progress=0;
+  tbRender();showToast('■ 任务已停止');
+}
+function tbReject(id,e){
+  e.stopPropagation();
+  const t=taskData.find(t=>t.id===id);if(!t)return;
+  t.col='progress';t.progress=0;t.thoughts.forEach(th=>th.done=false);
+  tbRender();showToast('↩ 已退回，Agent 重新执行');
+}
+function tbDone(id,e){
+  e.stopPropagation();
+  const t=taskData.find(t=>t.id===id);if(!t)return;
+  t.col='done';
+  if(selectedTaskId===id)closeDrawer();
+  tbRender();showToast('✅ 任务已完成！');
 }
 
-function deleteTask(id) {
-  taskData = taskData.filter(x => x.id !== id);
-  saveTasksToLocal();
-  scheduleSave();
-  tbRender();
+function tbOpenDrawer(id){
+  const t=taskData.find(t=>t.id===id);if(!t)return;
+  selectedTaskId=id;
+  const tc=teamColors2[t.team];
+  const tagClass='tag-'+t.team;
+  const slabels={todo:'待开始',progress:'执行中',review:'待审核',done:'已完成'};
+  const scolors={todo:'var(--text3)',progress:'var(--dev)',review:'var(--ops)',done:'var(--music)'};
+  const plabels={low:'低优先级',mid:'中优先级',high:'高优先级'};
+  const pcolors={low:'var(--text3)',mid:'var(--ops)',high:'var(--research)'};
+  const sc=scolors[t.col];
+
+  document.getElementById('drawer-title-el').textContent=t.title;
+  document.getElementById('drawer-status-row').innerHTML=`
+    <span style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:4px;border:1px solid ${sc};color:${sc};background:rgba(0,0,0,.2)">${slabels[t.col]}</span>
+    <span class="c-tag ${tagClass}" style="font-size:9px">${teamLabels2[t.team]}</span>
+    <span style="font-family:var(--mono);font-size:9px;color:${pcolors[t.priority]}">${plabels[t.priority]}</span>`;
+
+  let body=`<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Task Info</div>
+    <div style="display:grid;grid-template-columns:80px 1fr;gap:8px 12px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Team</div><div style="font-size:12px;color:${tc}">${teamLabels2[t.team]} Team</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Agent</div><div style="font-size:12px;color:var(--text2)">${t.agent||'未分配'}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Created</div><div style="font-size:12px;color:var(--text2)">${t.createdAt}</div>
+      ${t.desc?`<div style="font-family:var(--mono);font-size:10px;color:var(--text3)">描述</div><div style="font-size:12px;color:var(--text2)">${t.desc}</div>`:''}
+    </div>
+  </div>`;
+
+  if(t.col==='progress'&&t.thoughts.length){
+    body+=`<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">🧠 Agent Thinking</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.8;max-height:200px;overflow-y:auto">`;
+    t.thoughts.forEach((th,i)=>{
+      const isActive=i===t.thoughts.findIndex(x=>!x.done);
+      body+=`<div style="margin-bottom:4px">
+        <span style="color:${th.done?'var(--music)':'var(--text3)'}">${th.done?'✓':'›'}</span>
+        <span style="color:${th.done?'var(--text2)':'var(--text3)'};margin-left:6px">${th.text}</span>
+        ${isActive?'<span style="display:inline-block;width:6px;height:12px;background:var(--music);border-radius:1px;animation:blink .8s infinite;vertical-align:text-bottom;margin-left:2px"></span>':''}
+      </div>`;
+    });
+    body+=`</div>`;
+    const bc=t.progress<50?'var(--ops)':t.progress<90?'var(--dev)':'var(--music)';
+    body+=`<div style="margin-top:12px"><div style="height:6px;border-radius:3px;background:var(--bg4);overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${t.progress}%;background:${bc};border-radius:3px"></div></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">${t.progress}% complete</div></div></div>`;
+  }
+
+  if((t.col==='review'||t.col==='done')&&t.result){
+    body+=`<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">✨ Result</div>
+      <div style="background:var(--bg3);border:1px solid rgba(200,240,96,.15);border-radius:8px;padding:14px;font-size:12px;color:var(--text2);line-height:1.7">${t.result}</div>
+    </div>`;
+  }
+
+  // log
+  body+=`<div style="padding:16px 20px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Activity Log</div>`;
+  const logEntries=[];
+  logEntries.push({color:'var(--text3)',action:`任务创建于 ${t.createdAt}`,time:t.createdAt});
+  if(t.agent){logEntries.push({color:tc,action:`CTRL-Prime 分配给 ${t.agent}`,time:t.createdAt});logEntries.push({color:'var(--music)',action:`${t.agent} 开始执行`,time:t.createdAt});}
+  if(t.col==='review'||t.col==='done')logEntries.push({color:'var(--ops)',action:'任务完成，进入 Review',time:'完成时'});
+  if(t.col==='done')logEntries.push({color:'var(--music)',action:'你确认完成，任务归档',time:'今天'});
+  logEntries.forEach(l=>{
+    body+=`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div style="width:6px;height:6px;border-radius:50%;background:${l.color};flex-shrink:0;margin-top:5px"></div>
+      <div><div style="font-size:12px;color:var(--text)">${l.action}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${l.time}</div></div>
+    </div>`;
+  });
+  body+=`</div>`;
+
+  document.getElementById('drawer-body-el').innerHTML=body;
+
+  let footer='';
+  if(t.col==='todo') footer=`<button onclick="tbStart(${t.id},event);closeDrawer()" style="flex:1;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:8px;padding:10px;cursor:pointer">▶ Start Task</button>`;
+  else if(t.col==='progress') footer=`<button onclick="tbStop(${t.id},event);closeDrawer()" style="font-family:var(--mono);font-size:11px;background:rgba(240,96,128,.08);color:var(--research);border:1px solid rgba(240,96,128,.2);border-radius:8px;padding:10px 16px;cursor:pointer">■ Stop</button><button onclick="closeDrawer()" style="font-family:var(--mono);font-size:11px;background:none;color:var(--text3);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;cursor:pointer">关闭</button>`;
+  else if(t.col==='review') footer=`<button onclick="tbReject(${t.id},event);closeDrawer()" style="font-family:var(--mono);font-size:11px;background:rgba(240,168,64,.08);color:var(--ops);border:1px solid rgba(240,168,64,.2);border-radius:8px;padding:10px 16px;cursor:pointer">↩ Redo</button><button onclick="tbDone(${t.id},event);closeDrawer()" style="flex:1;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--music);color:#080809;border:none;border-radius:8px;padding:10px;cursor:pointer">✓ Confirm Done</button>`;
+  else footer=`<button onclick="closeDrawer()" style="font-family:var(--mono);font-size:11px;background:none;color:var(--text3);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;cursor:pointer">关闭</button>`;
+  document.getElementById('drawer-footer-el').innerHTML=footer;
+
+  document.getElementById('drawer').style.transform='translateX(0)';
+  document.getElementById('drawer-overlay').style.opacity='1';
+  document.getElementById('drawer-overlay').style.pointerEvents='all';
 }
 
-function tbFilter(team, btn) {
-  tbFilterTeam = team;
-  document.querySelectorAll('#tb-filters .rf-btn').forEach(b => b.classList.remove('active'));
+function closeDrawer(){
+  const d=document.getElementById('drawer');
+  const o=document.getElementById('drawer-overlay');
+  if(d){d.style.transform='translateX(100%)';}
+  if(o){o.style.opacity='0';o.style.pointerEvents='none';}
+  selectedTaskId=null;
+}
+
+// new task modal
+function openNewTask(){
+  ntTeam='dev';ntPriority='mid';
+  document.getElementById('nt-title').value='';
+  document.getElementById('nt-desc').value='';
+  document.getElementById('ntask-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('nt-title').focus(),100);
+}
+function closeNewTask(){document.getElementById('ntask-modal').style.display='none';}
+function ntSelTeam(el){
+  ntTeam=el.dataset.team;
+  document.querySelectorAll('.nt-topt').forEach(o=>{
+    const c=o.dataset.color;
+    const isSelected=o===el;
+    o.classList.toggle('selected',isSelected);
+    o.style.borderWidth=isSelected?'1.5px':'1px';
+    o.style.borderColor=isSelected?c:'var(--border)';
+    o.style.background=isSelected?`rgba(${teamRgb2[o.dataset.team]},.04)`:'';
+  });
+}
+function ntSelPri(el){
+  ntPriority=el.dataset.p;
+  const colors={low:'var(--text3)',mid:'var(--dev)',high:'var(--ops)'};
+  document.querySelectorAll('.nt-popt').forEach(o=>{
+    const isSel=o===el;
+    o.classList.toggle('selected',isSel);
+    o.style.borderColor=isSel?colors[o.dataset.p]:'var(--border)';
+    o.style.background=isSel?'var(--bg4)':'';
+  });
+}
+function createTask(){
+  const title=document.getElementById('nt-title').value.trim();
+  if(!title){document.getElementById('nt-title').focus();return;}
+  const desc=document.getElementById('nt-desc').value.trim();
+  const newId=Math.max(...taskData.map(t=>t.id))+1;
+  taskData.unshift({id:newId,col:'todo',title,desc,team:ntTeam,priority:ntPriority,agent:null,progress:0,createdAt:'刚刚',thoughts:[],result:null});
+  closeNewTask();
+  tbRender();
+  showToast(`✓ 任务已创建 · 等待分配给 ${teamLabels2[ntTeam]} Team`);
+}
+function tbFilter(team,btn){
+  tbFilterTeam=team;
+  document.querySelectorAll('#tb-filters .rf-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   tbRender();
 }
 
-// New task modal
-function openNewTaskModal() {
-  ntTeam = 'dev';
-  document.getElementById('nt-title').value = '';
-  document.getElementById('nt-desc').value = '';
-  renderNtTeamGrid();
-  document.getElementById('new-task-modal').classList.add('open');
-  setTimeout(() => document.getElementById('nt-title').focus(), 100);
-}
-function closeNewTaskModal() {
-  document.getElementById('new-task-modal').classList.remove('open');
-}
-
-function renderNtTeamGrid() {
-  const grid = document.getElementById('nt-team-grid');
-  const teams = [
-    { id: 'dev', label: 'Dev Team' },
-    { id: 'research', label: 'Research' },
-    { id: 'ops', label: 'Ops' },
-    { id: 'master', label: 'Master' },
-  ];
-  grid.innerHTML = teams.map(({ id, label }) => {
-    const tc = TEAM_COLORS[id] || TEAM_COLORS.dev;
-    const sel = id === ntTeam;
-    return `<div class="team-opt ${sel ? 'selected' : ''}" data-team="${id}"
-      style="${sel ? `border-color:${tc.color};background:rgba(${tc.rgb},.04)` : ''}"
-      onclick="selectNtTeam('${id}')">
-      <div style="width:8px;height:8px;border-radius:50%;background:${tc.color};flex-shrink:0"></div>
-      <div style="font-size:12px;font-weight:500">${label}</div>
-    </div>`;
-  }).join('');
-}
-
-function selectNtTeam(id) {
-  ntTeam = id;
-  renderNtTeamGrid();
-}
-
-function createTask() {
-  const title = document.getElementById('nt-title').value.trim();
-  if (!title) { document.getElementById('nt-title').focus(); return; }
-  const desc = document.getElementById('nt-desc').value.trim();
-  const id = Date.now();
-  const now = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
-  taskData.unshift({ id, col: 'todo', title, desc, team: ntTeam, priority: 'mid', progress: 0, createdAt: now, result: null });
-  saveTasksToLocal();
-  scheduleSave();
-  closeNewTaskModal();
-  tbRender();
-  showToast('任务已创建');
-}
-
-// ══════════════════════════════════════
-// AGENT CONFIG (settings page)
-// ══════════════════════════════════════
-function renderAgentsConfig() {
-  const el = document.getElementById('agents-config-list');
-  if (!el) return;
-  el.innerHTML = agents.map((ag, i) => {
-    const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
-    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="width:32px;height:32px;border-radius:8px;background:rgba(${tc.rgb},.12);color:${tc.color};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;flex-shrink:0">${ag.init}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:500">${escHtml(ag.name)}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${ag.role} · ${ag.team}</div>
-      </div>
-      <button class="settings-btn secondary" onclick="editAgent(${i})" style="padding:5px 12px;font-size:10px">Edit</button>
-      ${agents.length > 1 ? `<button class="settings-btn secondary" onclick="removeAgent(${i})" style="padding:5px 12px;font-size:10px;color:var(--research)">Del</button>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function removeAgent(i) {
-  if (!confirm(`删除 ${agents[i].name}？`)) return;
-  const id = agents[i].id;
-  agents.splice(i, 1);
-  saveAgents();
-  if (currentAgentId === id) {
-    currentAgentId = agents[0]?.id;
-    selectAgent(currentAgentId);
-  }
-  renderAgentsConfig();
-  renderAgentSidebar();
-}
-
-let editingAgentIdx = -1;
-function editAgent(i) {
-  editingAgentIdx = i;
-  const ag = agents[i];
-  document.getElementById('aa-name').value = ag.name;
-  document.getElementById('aa-role').value = ag.role;
-  document.getElementById('aa-team').value = ag.team;
-  document.getElementById('aa-system').value = ag.system;
-  document.getElementById('add-agent-modal').classList.add('open');
-}
-
-function openAddAgentModal() {
-  editingAgentIdx = -1;
-  document.getElementById('aa-name').value = '';
-  document.getElementById('aa-role').value = '';
-  document.getElementById('aa-team').value = 'dev';
-  document.getElementById('aa-system').value = '';
-  document.getElementById('add-agent-modal').classList.add('open');
-}
-function closeAddAgentModal() { document.getElementById('add-agent-modal').classList.remove('open'); }
-
-function addAgent() {
-  const name = document.getElementById('aa-name').value.trim();
-  if (!name) return;
-  const role = document.getElementById('aa-role').value.trim() || 'AI Assistant';
-  const team = document.getElementById('aa-team').value;
-  const system = document.getElementById('aa-system').value.trim() || 'You are a helpful AI assistant.';
-  const init = name.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-
-  if (editingAgentIdx >= 0) {
-    const ag = agents[editingAgentIdx];
-    ag.name = name; ag.role = role; ag.team = team; ag.system = system;
-    ag.init = init;
-    showToast(`${name} 已更新`);
-  } else {
-    const id = 'agent_' + Date.now();
-    agents.push({ id, name, role, team, init, system });
-    showToast(`${name} 已添加`);
-  }
-  saveAgents();
-  closeAddAgentModal();
-  renderAgentSidebar();
-  renderAgentsConfig();
-}
-
-// ══════════════════════════════════════
-// SETTINGS & THEME
-// ══════════════════════════════════════
-function loadSettingsUI() {
-  document.getElementById('cfg-endpoint').value = cfg.get('api_endpoint', '');
-  document.getElementById('cfg-apikey').value = cfg.get('api_key', '');
-  document.getElementById('cfg-model').value = cfg.get('default_model', '');
-  document.getElementById('cfg-models-extra').value = cfg.get('models_extra', '');
-  document.getElementById('cfg-gh-token').value = cfg.get('github_token', '');
-  document.getElementById('cfg-gist-id').value = cfg.get('gist_id', '');
-  autoSync = cfg.get('autosync', 'on') === 'on';
-  document.getElementById('toggle-autosync').classList.toggle('on', autoSync);
-
-  const light = cfg.get('theme', 'dark') === 'light';
-  document.body.classList.toggle('light', light);
-  document.getElementById('toggle-theme').classList.toggle('on', light);
-  updateApiStatus();
-  renderModelDropdown();
-  renderAgentsConfig();
-}
-
-function toggleAutoSync(el) {
-  el.classList.toggle('on');
-  autoSync = el.classList.contains('on');
-  cfg.set('autosync', autoSync ? 'on' : 'off');
-}
-
-function toggleTheme(el) {
-  el.classList.toggle('on');
-  const light = el.classList.contains('on');
-  document.body.classList.toggle('light', light);
-  cfg.set('theme', light ? 'light' : 'dark');
-}
-
-// ══════════════════════════════════════
-// MOBILE SIDEBAR
-// ══════════════════════════════════════
-function toggleMobileSidebar() {
-  const sidebar = document.querySelector('.agent-sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const isOpen = sidebar.classList.contains('open');
-  if (isOpen) { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
-  else { sidebar.classList.add('open'); overlay.classList.add('open'); }
-}
-function closeMobileSidebar() {
-  document.querySelector('.agent-sidebar')?.classList.remove('open');
-  document.getElementById('sidebar-overlay')?.classList.remove('open');
-}
-
-// ══════════════════════════════════════
-// PAGE NAVIGATION
-// ══════════════════════════════════════
-let currentPage = 'chat';
-function showPage(id, btn) {
-  currentPage = id;
-  // hide all
-  ['chat', 'tasks', 'settings'].forEach(p => {
-    const el = document.getElementById('page-' + p);
-    if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+// auto-progress simulation
+setInterval(()=>{
+  let changed=false;
+  taskData.filter(t=>t.col==='progress').forEach(t=>{
+    if(t.progress<100){
+      t.progress=Math.min(100,t.progress+(Math.random()*1.5+0.5));
+      t.thoughts.forEach((th,i)=>{if(t.progress>=(i+1)/t.thoughts.length*90)th.done=true;});
+      if(t.progress>=100){t.col='review';if(!t.result)t.result=`${t.agent} 已完成「${t.title}」。详情请查看结果。`;}
+      changed=true;
+    }
   });
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.bnav-btn').forEach(t => t.classList.remove('active'));
+  if(changed)tbRender();
+},3000);
 
-  if (id === 'chat') {
-    const el = document.getElementById('page-chat');
-    el.style.display = 'flex'; el.classList.add('active');
-    // show mobile menu button only on chat page
-    document.getElementById('mob-menu-btn').style.display = '';
-  } else if (id === 'tasks') {
-    const el = document.getElementById('page-tasks');
-    el.style.display = 'flex'; el.style.flexDirection = 'column'; el.classList.add('active');
-    document.getElementById('mob-menu-btn').style.display = 'none';
-    tbRender();
-  } else if (id === 'settings') {
-    const el = document.getElementById('page-settings');
-    el.style.display = 'block'; el.classList.add('active');
-    document.getElementById('mob-menu-btn').style.display = 'none';
-    loadSettingsUI();
-  }
-
-  // activate desktop nav tab
-  document.querySelectorAll('.nav-tab').forEach(t => {
-    if (t.getAttribute('onclick')?.includes("'" + id + "'")) t.classList.add('active');
+// ── THEME TOGGLE ──
+function setTheme(dark){
+  if(dark){document.body.classList.remove('light');}
+  else{document.body.classList.add('light');}
+  document.querySelectorAll('.theme-opt').forEach(o=>{
+    const isActive=o.dataset.dark===(dark?'1':'0');
+    o.style.borderWidth=isActive?'1.5px':'1px';
+    o.style.borderColor=isActive?'var(--dev)':'var(--border)';
+    o.style.background=isActive?'rgba(96,184,240,.06)':'';
+    // update checkmark
+    const chk=o.querySelector('span:last-child');
+    if(chk) chk.style.display=isActive?'':'none';
   });
-  // activate mobile bottom nav
-  const bnavEl = document.getElementById('bnav-' + id);
-  if (bnavEl) bnavEl.classList.add('active');
 }
 
-// ══════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── SETTINGS ──
+function setAccent(){} // deprecated
+
+function showToast(msg){
+  let t=document.getElementById('toast-el');
+  if(!t){t=document.createElement('div');t.id='toast-el';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:9px 20px;border-radius:20px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);transition:opacity .3s;white-space:nowrap';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2400);
 }
 
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
-loadAgents();
-loadTasksFromLocal();
-updateApiStatus();
-
-// select first agent
-if (agents.length) {
-  currentAgentId = agents[0].id;
-  currentModel = cfg.get('default_model', '');
-}
-
-// apply saved theme
-const savedTheme = cfg.get('theme', 'dark');
-if (savedTheme === 'light') document.body.classList.add('light');
-
-// render sidebar
-renderAgentSidebar();
-
-// render initial chat
-if (currentAgentId) {
-  selectAgent(currentAgentId);
-}
-
-// init tasks render
+// ── INIT ──
 tbRender();
-
-// try load from gist on startup (silent)
-if (cfg.get('github_token') && cfg.get('gist_id')) {
-  loadFromGist(false);
-}
-
-// render model dropdown
-renderModelDropdown();
-
+renderLogs();
+renderAct();
+// init theme cards — dark is default, hide light checkmark
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.theme-opt').forEach(o=>{
+    const chk=o.querySelector('span:last-child');
+    if(chk && o.dataset.dark==='0') chk.style.display='none';
+  });
+});
 </script>
 </body>
 </html>
