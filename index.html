@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080809">
+<title>CTRL.ai</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:#080809; --bg2:#0e0e11; --bg3:#141418; --bg4:#1a1a20; --bg5:#202028;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e2e0ec; --text2:#8a8898; --text3:#5a5868;
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+  --dev:#60b8f0; --research:#f06080; --ops:#f0a840; --accent:#c8f060;
+}
+body.light {
+  --bg:#f4f5f7; --bg2:#ffffff; --bg3:#eef0f3; --bg4:#e4e6ea; --bg5:#dcdfe4;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+  --text:#1a1a24; --text2:#4a4a5a; --text3:#8a8a9a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:44px;border-bottom:1px solid var(--border);flex-shrink:0;z-index:200;}
+.logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.15em;color:var(--accent);}
+.logo span{color:var(--text3);font-weight:300;}
+.nav-tabs{display:flex;gap:2px;margin-left:16px;}
+.nav-tab{font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:5px 12px;border-radius:4px;cursor:pointer;color:var(--text3);border:none;background:none;transition:all .15s;}
+.nav-tab:hover{color:var(--text2);background:var(--bg3);}
+.nav-tab.active{color:var(--accent);background:rgba(200,240,96,.08);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.api-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .15s;}
+.api-status:hover{border-color:var(--border2);}
+.api-status.ok{color:var(--accent);border-color:rgba(200,240,96,.2);}
+.api-status.err{color:var(--research);border-color:rgba(240,96,128,.2);}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 2s infinite;flex-shrink:0;}
+.pulse.err{background:var(--research);box-shadow:0 0 8px var(--research);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── PAGES ── */
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;}
+
+/* ── SIDEBAR LAYOUT ── */
+.sidebar-layout{display:grid;grid-template-columns:240px 1fr;flex:1;overflow:hidden;}
+
+/* ── LEFT SIDEBAR ── */
+.agent-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-top{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sidebar-search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;}
+.sidebar-search::placeholder{color:var(--text3);}
+.agents-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.master-sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 16px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border);position:relative;background:linear-gradient(90deg,rgba(200,240,96,.03),transparent);}
+.master-sidebar-item:hover{background:linear-gradient(90deg,rgba(200,240,96,.07),transparent);}
+.master-sidebar-item.active{background:linear-gradient(90deg,rgba(200,240,96,.1),rgba(200,240,96,.02));}
+.master-crown-tag{position:absolute;top:0;left:0;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--accent);background:rgba(200,240,96,.1);padding:2px 7px;border-radius:0 0 5px 0;}
+.master-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(200,240,96,.2),rgba(200,240,96,.08));border:1px solid rgba(200,240,96,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;}
+.av-status{position:absolute;bottom:-2px;right:-2px;width:9px;height:9px;border-radius:50%;border:2px solid var(--bg);}
+.master-info{flex:1;min-width:0;margin-top:6px;}
+.master-info-name{font-size:13px;font-weight:600;color:var(--accent);}
+.master-info-sub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;}
+.team-header{display:flex;align-items:center;gap:8px;padding:10px 16px 6px;position:sticky;top:0;z-index:2;background:var(--bg);}
+.team-stripe{width:3px;height:14px;border-radius:2px;flex-shrink:0;}
+.team-label{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;}
+.agent-row{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .12s;border-left:2px solid transparent;position:relative;}
+.agent-row:hover{background:var(--bg3);}
+.agent-row.active{background:var(--bg3);}
+.agent-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;flex-shrink:0;position:relative;}
+.agent-info{flex:1;min-width:0;}
+.agent-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.agent-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agent-model-tag{font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;background:var(--bg4);color:var(--text3);}
+.agent-task-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── MAIN CHAT ── */
+.main-content{display:flex;flex-direction:column;overflow:hidden;}
+.tab-pane{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.tab-pane.active{display:flex;}
+
+/* chat header */
+.chat-header{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.chat-header-av{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;}
+.chat-header-info{flex:1;}
+.chat-header-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.chat-header-meta{font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;align-items:center;gap:8px;}
+.chat-dot{width:6px;height:6px;border-radius:50%;}
+.model-sw{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;cursor:pointer;transition:all .15s;position:relative;}
+.model-sw:hover{background:var(--bg4);}
+.model-sw-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;}
+.model-sw-name{font-family:var(--mono);font-size:11px;color:var(--text);}
+.model-dd{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px;min-width:220px;z-index:300;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.model-dd.open{display:block;}
+.model-opt{padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s;}
+.model-opt:hover{background:var(--bg4);}
+.model-opt.selected{background:rgba(200,240,96,.06);}
+.model-opt-name{font-family:var(--mono);font-size:11px;color:var(--text);margin-bottom:2px;}
+.model-opt-desc{font-size:10px;color:var(--text3);}
+.model-chk{float:right;color:var(--accent);font-size:11px;}
+
+/* chat messages */
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px 10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.date-sep{display:flex;align-items:center;gap:10px;margin:8px 0;}
+.date-line{flex:1;height:1px;background:var(--border);}
+.date-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;}
+.msg-group{display:flex;flex-direction:column;gap:2px;}
+.msg-group.from-user{align-items:flex-end;}
+.msg-group.from-agent{align-items:flex-start;}
+.msg-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;padding:0 2px;}
+.msg-group.from-user .msg-meta{flex-direction:row-reverse;}
+.msg-av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;flex-shrink:0;}
+.msg-sender{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.msg-time{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.bubble{max-width:78%;padding:9px 13px;border-radius:14px;line-height:1.65;font-size:13px;}
+.bubble.from-agent{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);}
+.bubble.from-user{background:var(--bg4);border:1px solid var(--border2);border-bottom-right-radius:4px;color:var(--text);}
+.bubble code{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;}
+.bubble pre{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;margin-top:8px;font-family:var(--mono);font-size:11px;overflow-x:auto;color:var(--text2);white-space:pre-wrap;}
+.streaming-cursor::after{content:'▋';animation:blink .8s infinite;color:var(--accent);}
+.typing-bub{background:var(--bg3);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:4px;padding:10px 14px;display:flex;gap:4px;align-items:center;}
+.t-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tdot 1.3s infinite;}
+.t-dot:nth-child(2){animation-delay:.15s}.t-dot:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);background:var(--text3)}30%{transform:translateY(-5px)}}
+
+/* chat input */
+.chat-input-wrap{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end;}
+.chat-ta{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:13px;resize:none;outline:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color .15s;}
+.chat-ta:focus{border-color:rgba(200,240,96,.3);}
+.chat-ta::placeholder{color:var(--text3);}
+.send-btn{width:42px;height:42px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.send-btn:hover{filter:brightness(1.15);transform:scale(1.04);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.send-btn svg{width:16px;height:16px;}
+
+/* system note */
+.system-note{background:rgba(200,240,96,.04);border:1px solid rgba(200,240,96,.12);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:10px;color:rgba(200,240,96,.6);text-align:center;margin:4px 0;}
+
+/* ── TASKS PAGE ── */
+.tasks-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.kanban-wrap{flex:1;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;}
+.kanban-col{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;}
+.kanban-col:last-child{border-right:none;}
+.col-top-stripe{height:2px;flex-shrink:0;}
+.col-header-inner{padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.col-header-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.col-title{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);}
+.col-count{font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:4px;margin-left:auto;}
+.col-desc{font-size:11px;color:var(--text3);}
+.col-body{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+
+/* task cards */
+.task-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;}
+.task-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.card-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.card-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;flex:1;}
+.card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.card-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;}
+.tag-dev{background:rgba(96,184,240,.1);color:var(--dev)}.tag-research{background:rgba(240,96,128,.1);color:var(--research)}.tag-ops{background:rgba(240,168,64,.1);color:var(--ops)}.tag-master{background:rgba(200,240,96,.1);color:var(--accent)}
+.card-time{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;}
+.card-progress{margin-top:8px;}
+.progress-bar-wrap{height:3px;background:var(--bg5);border-radius:2px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .5s;}
+.card-result{margin-top:8px;font-size:11px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border);padding-top:8px;}
+.card-actions{display:flex;gap:6px;margin-top:8px;}
+.card-btn{font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);cursor:pointer;color:var(--text3);background:none;transition:all .15s;}
+.card-btn:hover{color:var(--text);border-color:var(--border2);}
+.card-btn.primary{background:var(--accent);color:#080809;border-color:var(--accent);}
+.card-btn.primary:hover{background:#d8ff70;}
+
+/* gist sync indicator */
+.sync-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--text3);}
+.sync-badge.syncing{color:var(--ops);}
+.sync-badge.synced{color:var(--accent);}
+.sync-badge.error{color:var(--research);}
+
+/* ── SETTINGS PAGE ── */
+.settings-page{flex:1;overflow-y:auto;display:none;}
+.settings-page.active{display:block;}
+.settings-container{max-width:680px;margin:0 auto;padding:32px 24px;}
+.settings-title{font-size:22px;font-weight:600;margin-bottom:4px;}
+.settings-sub{font-size:13px;color:var(--text3);margin-bottom:32px;}
+.settings-section{margin-bottom:28px;}
+.settings-section-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.settings-row{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:20px;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-info{flex:1;}
+.settings-row-label{font-size:13px;font-weight:500;margin-bottom:3px;}
+.settings-row-desc{font-size:11px;color:var(--text3);}
+.settings-input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;width:280px;transition:border-color .15s;}
+.settings-input:focus{border-color:rgba(200,240,96,.3);}
+.settings-input::placeholder{color:var(--text3);}
+.settings-input.full{width:100%;margin-top:8px;}
+.settings-btn{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--accent);color:#080809;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.settings-btn:hover{background:#d8ff70;}
+.settings-btn.secondary{background:none;color:var(--text2);border:1px solid var(--border2);}
+.settings-btn.secondary:hover{background:var(--bg3);}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--bg4);border:1px solid var(--border2);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0;margin-top:2px;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text3);transition:all .2s;}
+.toggle.on::after{left:20px;background:#080809;}
+.status-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;margin-top:6px;}
+.status-tag.ok{background:rgba(200,240,96,.08);color:var(--accent);border:1px solid rgba(200,240,96,.2);}
+.status-tag.err{background:rgba(240,96,128,.08);color:var(--research);border:1px solid rgba(240,96,128,.2);}
+.status-tag.neutral{background:var(--bg4);color:var(--text3);border:1px solid var(--border);}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:24px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.modal-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;}
+.modal-input{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;margin-bottom:14px;}
+.modal-input:focus{border-color:rgba(200,240,96,.3);}
+.modal-select{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;margin-bottom:14px;cursor:pointer;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.modal-cancel{background:none;border:1px solid var(--border2);color:var(--text3);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;}
+.modal-confirm{background:var(--accent);color:#080809;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;}
+.modal-confirm:hover{background:#d8ff70;}
+.modal-textarea{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;margin-bottom:14px;resize:none;height:80px;line-height:1.5;}
+
+/* new task team options */
+.team-opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+.team-opt{padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
+.team-opt:hover{border-color:var(--border2);background:var(--bg4);}
+.team-opt.selected{border-width:1.5px;}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:9px 20px;border-radius:20px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* rf-btn (filter buttons) */
+.rf-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;color:var(--text3);background:none;transition:all .12s;}
+.rf-btn:hover{color:var(--text2);}
+.rf-btn.active{background:var(--bg3);border-color:var(--border2);color:var(--text);}
+
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* ══════════════════════════════
+   MOBILE / RESPONSIVE
+══════════════════════════════ */
+
+/* Bottom nav (mobile only) */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--bg2);border-top:1px solid var(--border);z-index:300;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-nav-inner{display:flex;height:56px;}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--text3);font-family:var(--mono);font-size:9px;letter-spacing:.08em;cursor:pointer;transition:color .15s;}
+.bnav-btn.active{color:var(--accent);}
+.bnav-icon{font-size:18px;line-height:1;}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:290;backdrop-filter:blur(2px);}
+.sidebar-overlay.open{display:block;}
+
+/* Mobile menu button */
+.mob-menu-btn{display:none;width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;align-items:center;justify-content:center;color:var(--text2);font-size:16px;flex-shrink:0;}
+
+@media (max-width: 767px) {
+  /* topbar: hide desktop nav, show menu btn */
+  .nav-tabs{display:none;}
+  .mob-menu-btn{display:flex;}
+  .api-status-txt-full{display:none;}
+  .sync-badge{display:none;}
+
+  /* pages take full height minus bottom nav */
+  body{padding-bottom:56px;}
+
+  /* bottom nav visible */
+  .bottom-nav{display:flex;}
+
+  /* chat sidebar: off-canvas */
+  .agent-sidebar{
+    position:fixed;left:0;top:44px;bottom:56px;width:80%;max-width:280px;
+    background:var(--bg2);z-index:295;transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    border-right:1px solid var(--border2);
+  }
+  .agent-sidebar.open{transform:translateX(0);}
+
+  /* sidebar layout: full width for main */
+  .sidebar-layout{grid-template-columns:1fr;}
+
+  /* tasks: 2-col on mobile, scrollable horizontally */
+  .kanban-wrap{
+    display:flex;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  }
+  .kanban-col{min-width:84vw;scroll-snap-align:start;border-right:1px solid var(--border);}
+  .kanban-col:last-child{border-right:none;}
+
+  /* settings: full padding */
+  .settings-container{padding:20px 16px;}
+  .settings-input{width:100%;}
+  .settings-row{flex-direction:column;align-items:flex-start;gap:10px;}
+  .settings-row > .toggle{margin-top:0;}
+
+  /* modals: full width on mobile */
+  .modal-box{width:calc(100vw - 32px);max-width:100%;}
+  .team-opt-grid{grid-template-columns:1fr 1fr;}
+
+  /* chat bubbles wider on mobile */
+  .bubble{max-width:90%;}
+
+  /* model switcher: compact */
+  .model-sw .model-sw-name{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+}
+
+@media (min-width:768px) and (max-width:1024px) {
+  /* tablet: narrower sidebar */
+  .sidebar-layout{grid-template-columns:200px 1fr;}
+  .kanban-col{min-width:0;}
+  .settings-container{padding:24px 20px;}
+  .settings-input{width:240px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="mob-menu-btn" id="mob-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+    <div class="logo">CTRL<span>.ai</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('chat',this)">CHAT</button>
+      <button class="nav-tab" onclick="showPage('tasks',this)">TASKS</button>
+      <button class="nav-tab" onclick="showPage('settings',this)">SETTINGS</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="api-status" id="api-status-pill" onclick="showPage('settings',document.querySelector('.nav-tab:last-child'))">
+      <div class="pulse err" id="api-pulse"></div>
+      <span id="api-status-txt">未配置 API</span>
+    </div>
+    <div class="sync-badge" id="sync-badge" style="margin-right:4px">
+      <span id="sync-icon">◯</span>
+      <span id="sync-txt">GitHub</span>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnav-chat" onclick="showPage('chat',this);closeMobileSidebar()">
+      <span class="bnav-icon">💬</span>CHAT
+    </button>
+    <button class="bnav-btn" id="bnav-tasks" onclick="showPage('tasks',this)">
+      <span class="bnav-icon">📋</span>TASKS
+    </button>
+    <button class="bnav-btn" id="bnav-settings" onclick="showPage('settings',this)">
+      <span class="bnav-icon">⚙️</span>SETTINGS
+    </button>
+  </div>
+</nav>
+
+<!-- ════ CHAT PAGE ════ -->
+<div class="page active" id="page-chat">
+  <div class="sidebar-layout">
+
+    <!-- sidebar -->
+    <div class="agent-sidebar">
+      <div class="sidebar-top">
+        <input class="sidebar-search" placeholder="搜索 agent..." oninput="filterAgents(this.value)"/>
+      </div>
+      <div class="agents-scroll" id="agents-scroll">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- chat main -->
+    <div class="main-content">
+      <div class="tab-pane active" id="chat-pane">
+
+        <!-- agent header -->
+        <div class="chat-header">
+          <div class="chat-header-av" id="hdr-av" style="background:rgba(200,240,96,.12);color:var(--accent)">🧠</div>
+          <div class="chat-header-info">
+            <div class="chat-header-name" id="hdr-name">CTRL-Prime</div>
+            <div class="chat-header-meta">
+              <div class="chat-dot" id="hdr-dot" style="background:var(--accent);box-shadow:0 0 5px var(--accent)"></div>
+              <span id="hdr-role">Master Orchestrator</span>
+              <span style="color:var(--border2)">·</span>
+              <span id="hdr-tokens" style="color:var(--text3)">0 tokens</span>
+            </div>
+          </div>
+          <!-- model switcher -->
+          <div class="model-sw" onclick="toggleMDD(event)">
+            <div>
+              <div class="model-sw-lbl">MODEL</div>
+              <div class="model-sw-name" id="hdr-model">—</div>
+            </div>
+            <span style="font-size:9px;color:var(--text3)">▾</span>
+            <div class="model-dd" id="model-dd" onclick="event.stopPropagation()"></div>
+          </div>
+          <!-- clear chat -->
+          <button onclick="clearCurrentChat()" style="width:32px;height:32px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;font-size:13px" title="清空对话" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">🗑</button>
+        </div>
+
+        <!-- messages -->
+        <div class="chat-messages" id="chat-msgs"></div>
+
+        <!-- input -->
+        <div class="chat-input-wrap">
+          <div class="chat-input-row">
+            <textarea class="chat-ta" id="chat-ta" placeholder="发消息..." rows="1"
+              onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="send-btn" style="background:var(--accent)" onclick="sendMsg()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#080809" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TASKS PAGE ════ -->
+<div class="page" id="page-tasks" style="flex-direction:column">
+
+  <div class="tasks-topbar">
+    <div>
+      <div style="font-size:15px;font-weight:600">Task Board</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px" id="tb-meta">0 tasks</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="display:flex;gap:4px" id="tb-filters">
+        <button class="rf-btn active" onclick="tbFilter('all',this)">ALL</button>
+        <button class="rf-btn" onclick="tbFilter('dev',this)">DEV</button>
+        <button class="rf-btn" onclick="tbFilter('research',this)">RESEARCH</button>
+        <button class="rf-btn" onclick="tbFilter('ops',this)">OPS</button>
+        <button class="rf-btn" onclick="tbFilter('master',this)">MASTER</button>
+      </div>
+      <button onclick="openNewTaskModal()"
+        style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--accent);color:#080809;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:all .15s"
+        onmouseover="this.style.background='#d8ff70'" onmouseout="this.style.background='var(--accent)'">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#080809" stroke-width="2" stroke-linecap="round"/></svg>
+        New Task
+      </button>
+    </div>
+  </div>
+
+  <div class="kanban-wrap">
+    <div class="kanban-col">
+      <div class="col-top-stripe" style="background:var(--border2)"></div>
+      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">📥</span><span class="col-title">To Do</span><span class="col-count" id="cnt-todo">0</span></div><div class="col-desc">新任务 · 点击 ▶ 开始</div></div>
+      <div class="col-body" id="body-todo"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-top-stripe" style="background:var(--dev)"></div>
+      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">⚡</span><span class="col-title">In Progress</span><span class="col-count" id="cnt-progress">0</span></div><div class="col-desc">执行中 · 点击查看详情</div></div>
+      <div class="col-body" id="body-progress"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-top-stripe" style="background:var(--ops)"></div>
+      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">👁</span><span class="col-title">Review</span><span class="col-count" id="cnt-review">0</span></div><div class="col-desc">等待确认 · 点击审阅</div></div>
+      <div class="col-body" id="body-review"></div>
+    </div>
+    <div class="kanban-col">
+      <div class="col-top-stripe" style="background:var(--accent)"></div>
+      <div class="col-header-inner"><div class="col-header-row"><span style="font-size:14px">✅</span><span class="col-title">Done</span><span class="col-count" id="cnt-done">0</span></div><div class="col-desc">已完成归档</div></div>
+      <div class="col-body" id="body-done"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ SETTINGS PAGE ════ -->
+<div class="settings-page" id="page-settings">
+  <div class="settings-container">
+    <div class="settings-title">Settings</div>
+    <div class="settings-sub">配置 API 接口与 GitHub 存储</div>
+
+    <!-- AI API -->
+    <div class="settings-section">
+      <div class="settings-section-title">AI API — OpenAI 兼容接口</div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">API Endpoint</div>
+          <div class="settings-row-desc">OpenClaw / OpenAI 兼容的 base URL，例如 https://api.openclaw.ai/v1</div>
+        </div>
+        <input class="settings-input full" id="cfg-endpoint" placeholder="https://api.openclaw.ai/v1"
+          onchange="saveSetting('api_endpoint',this.value);updateApiStatus()" />
+      </div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">API Key</div>
+          <div class="settings-row-desc">Bearer Token，存于 localStorage，不上传</div>
+        </div>
+        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
+          <input class="settings-input" id="cfg-apikey" type="password" placeholder="sk-..."
+            style="flex:1" onchange="saveSetting('api_key',this.value);updateApiStatus()" />
+          <button class="settings-btn secondary" onclick="testApi()">Test Connection</button>
+        </div>
+        <div id="api-test-result" style="margin-top:6px"></div>
+      </div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">默认模型</div>
+          <div class="settings-row-desc">发消息时默认使用的模型 ID</div>
+        </div>
+        <input class="settings-input full" id="cfg-model" placeholder="gpt-4o / claude-3-5-sonnet-20241022"
+          onchange="saveSetting('default_model',this.value);renderModelDropdown()" />
+      </div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">备用模型（可选）</div>
+          <div class="settings-row-desc">多个模型用逗号分隔，会出现在 model switcher 中</div>
+        </div>
+        <input class="settings-input full" id="cfg-models-extra" placeholder="gpt-4o-mini, claude-3-haiku-20240307"
+          onchange="saveSetting('models_extra',this.value);renderModelDropdown()" />
+      </div>
+    </div>
+
+    <!-- GitHub -->
+    <div class="settings-section">
+      <div class="settings-section-title">GitHub — Task 持久化存储</div>
+      <div style="background:rgba(200,240,96,.04);border:1px solid rgba(200,240,96,.12);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        Tasks 以 JSON 格式存储在 GitHub Gist 中。需要一个 Personal Access Token（gist scope）。<br>
+        <a href="https://github.com/settings/tokens/new?scopes=gist&description=CTRL.ai" target="_blank"
+          style="color:var(--dev);text-decoration:none;font-family:var(--mono);font-size:11px">→ 生成 GitHub Token</a>
+      </div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">GitHub Token</div>
+          <div class="settings-row-desc">ghp_... · 仅需 gist scope</div>
+        </div>
+        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
+          <input class="settings-input" id="cfg-gh-token" type="password" placeholder="ghp_..."
+            style="flex:1" onchange="saveSetting('github_token',this.value)" />
+          <button class="settings-btn secondary" onclick="testGithub()">Test</button>
+        </div>
+        <div id="gh-test-result" style="margin-top:6px"></div>
+      </div>
+
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Gist ID</div>
+          <div class="settings-row-desc">留空则自动创建新 Gist；或粘贴已有 Gist ID</div>
+        </div>
+        <div style="display:flex;gap:8px;width:100%;margin-top:8px">
+          <input class="settings-input" id="cfg-gist-id" placeholder="留空自动创建"
+            style="flex:1" onchange="saveSetting('gist_id',this.value)" />
+          <button class="settings-btn secondary" onclick="loadFromGist(true)">Load</button>
+          <button class="settings-btn" onclick="saveToGist(true)">Save Now</button>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">自动同步</div>
+          <div class="settings-row-desc">Task 变更时自动保存到 Gist</div>
+        </div>
+        <div class="toggle on" id="toggle-autosync" onclick="toggleAutoSync(this)"></div>
+      </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="settings-section">
+      <div class="settings-section-title">Agents 配置</div>
+      <div id="agents-config-list"></div>
+      <button class="settings-btn secondary" style="margin-top:12px" onclick="openAddAgentModal()">+ 添加 Agent</button>
+    </div>
+
+    <!-- Appearance -->
+    <div class="settings-section">
+      <div class="settings-section-title">Appearance</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">Theme</div><div class="settings-row-desc">深色 / 浅色</div></div>
+        <div class="toggle" id="toggle-theme" onclick="toggleTheme(this)"></div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="settings-section">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px">
+        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent)">CTRL</div>
+        <div>
+          <div style="font-size:13px;font-weight:500">CTRL.ai MVP</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">v0.1.0 · Chat + Tasks · OpenAI-compatible API</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ NEW TASK MODAL ════ -->
+<div class="modal-overlay" id="new-task-modal" onclick="if(event.target===this)closeNewTaskModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">New Task</div>
+    <div class="modal-sub">创建后可指派 Agent 执行</div>
+
+    <div class="modal-label">任务标题 *</div>
+    <input class="modal-input" id="nt-title" placeholder="描述你想要完成的事..."
+      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"
+      onkeydown="if(event.key==='Enter')createTask()" />
+
+    <div class="modal-label">任务描述（可选）</div>
+    <textarea class="modal-textarea" id="nt-desc" placeholder="更多背景信息..."
+      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+
+    <div class="modal-label">分配团队</div>
+    <div class="team-opt-grid" id="nt-team-grid"></div>
+
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeNewTaskModal()">取消</button>
+      <button class="modal-confirm" onclick="createTask()">创建任务</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADD AGENT MODAL ════ -->
+<div class="modal-overlay" id="add-agent-modal" onclick="if(event.target===this)closeAddAgentModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">Add Agent</div>
+    <div class="modal-sub">添加一个新的 AI 助手到 Chat 列表</div>
+
+    <div class="modal-label">名称</div>
+    <input class="modal-input" id="aa-name" placeholder="Agent Name"
+      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'" />
+
+    <div class="modal-label">角色描述</div>
+    <input class="modal-input" id="aa-role" placeholder="e.g. Dev Assistant"
+      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'" />
+
+    <div class="modal-label">团队</div>
+    <select class="modal-select" id="aa-team">
+      <option value="master">Master</option>
+      <option value="dev">Dev</option>
+      <option value="research">Research</option>
+      <option value="ops">Ops</option>
+    </select>
+
+    <div class="modal-label">System Prompt</div>
+    <textarea class="modal-textarea" id="aa-system" style="height:100px" placeholder="You are a helpful AI assistant..."
+      onfocus="this.style.borderColor='rgba(200,240,96,.3)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeAddAgentModal()">取消</button>
+      <button class="modal-confirm" onclick="addAgent()">添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════
+// CONFIG — localStorage backed
+// ══════════════════════════════════════
+const cfg = {
+  get(k, def = '') { return localStorage.getItem('ctrl_' + k) ?? def; },
+  set(k, v) { localStorage.setItem('ctrl_' + k, String(v)); },
+};
+function saveSetting(key, val) { cfg.set(key, val); }
+
+// ══════════════════════════════════════
+// AGENTS STATE
+// ══════════════════════════════════════
+const TEAM_COLORS = {
+  master: { color: 'var(--accent)', rgb: '200,240,96' },
+  dev:    { color: 'var(--dev)',    rgb: '96,184,240' },
+  research:{ color: 'var(--research)', rgb: '240,96,128' },
+  ops:    { color: 'var(--ops)',    rgb: '240,168,64' },
+};
+
+function getDefaultAgents() {
+  return [
+    { id: 'prime', name: 'CTRL-Prime', role: 'Master Orchestrator', team: 'master', init: '🧠',
+      system: 'You are CTRL-Prime, an intelligent AI assistant and task coordinator. You help the user plan, organize, and execute complex multi-step goals. Be concise, practical, and proactive. Respond in the language the user uses.' },
+    { id: 'dev', name: 'Dev Agent', role: 'Software Developer', team: 'dev', init: 'DV',
+      system: 'You are a senior software developer AI. You help with coding, architecture decisions, debugging, and technical planning. Provide code examples when relevant. Respond in the language the user uses.' },
+    { id: 'research', name: 'Research', role: 'Market & Data Research', team: 'research', init: 'RE',
+      system: 'You are a research analyst AI. You help with market research, competitive analysis, data summarization, and information gathering. Be thorough and cite sources when available. Respond in the language the user uses.' },
+  ];
+}
+
+let agents = [];
+function loadAgents() {
+  try {
+    const stored = cfg.get('agents', '');
+    agents = stored ? JSON.parse(stored) : getDefaultAgents();
+  } catch { agents = getDefaultAgents(); }
+}
+function saveAgents() { cfg.set('agents', JSON.stringify(agents)); }
+
+// ══════════════════════════════════════
+// CONVERSATIONS (in-memory per session)
+// ══════════════════════════════════════
+const conversations = {}; // agentId -> [{role, content}]
+let currentAgentId = null;
+let currentModel = '';
+let isSending = false;
+let totalTokens = 0;
+
+function getConversation(agentId) {
+  if (!conversations[agentId]) conversations[agentId] = [];
+  return conversations[agentId];
+}
+
+// ══════════════════════════════════════
+// TASKS STATE
+// ══════════════════════════════════════
+let taskData = [];
+let tbFilterTeam = 'all';
+let ntTeam = 'dev';
+let autoSync = true;
+
+function loadTasksFromLocal() {
+  try {
+    const s = cfg.get('tasks_local', '');
+    if (s) taskData = JSON.parse(s);
+    else taskData = [];
+  } catch { taskData = []; }
+}
+function saveTasksToLocal() {
+  cfg.set('tasks_local', JSON.stringify(taskData));
+}
+
+// ══════════════════════════════════════
+// GITHUB GIST
+// ══════════════════════════════════════
+let syncTimeout = null;
+
+function scheduleSave() {
+  if (!autoSync) return;
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => saveToGist(false), 2000);
+}
+
+async function saveToGist(manual = false) {
+  const token = cfg.get('github_token');
+  if (!token) { if (manual) showToast('请先配置 GitHub Token'); return; }
+  setSyncState('syncing');
+  const gistId = cfg.get('gist_id');
+  const payload = {
+    files: {
+      'ctrl_tasks.json': { content: JSON.stringify(taskData, null, 2) }
+    }
+  };
+  try {
+    const url = gistId
+      ? `https://api.github.com/gists/${gistId}`
+      : 'https://api.github.com/gists';
+    const method = gistId ? 'PATCH' : 'POST';
+    if (!gistId) {
+      payload.public = false;
+      payload.description = 'CTRL.ai — Task Board';
+    }
+    const res = await fetch(url, {
+      method,
+      headers: { Authorization: 'token ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(res.status);
+    const json = await res.json();
+    if (!gistId) {
+      cfg.set('gist_id', json.id);
+      const el = document.getElementById('cfg-gist-id');
+      if (el) el.value = json.id;
+      showToast('Gist 已创建: ' + json.id.slice(0, 8) + '...');
+    }
+    setSyncState('synced');
+    if (manual) showToast('已同步到 GitHub Gist');
+  } catch (e) {
+    setSyncState('error');
+    if (manual) showToast('同步失败: ' + e.message);
+  }
+}
+
+async function loadFromGist(manual = false) {
+  const token = cfg.get('github_token');
+  const gistId = cfg.get('gist_id');
+  if (!token || !gistId) {
+    if (manual) showToast('请先配置 GitHub Token 和 Gist ID');
+    return;
+  }
+  setSyncState('syncing');
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: { Authorization: 'token ' + token }
+    });
+    if (!res.ok) throw new Error(res.status);
+    const json = await res.json();
+    const content = json.files?.['ctrl_tasks.json']?.content;
+    if (content) {
+      taskData = JSON.parse(content);
+      saveTasksToLocal();
+      tbRender();
+      setSyncState('synced');
+      if (manual) showToast('Tasks 已从 Gist 加载');
+    }
+  } catch (e) {
+    setSyncState('error');
+    if (manual) showToast('加载失败: ' + e.message);
+  }
+}
+
+function setSyncState(state) {
+  const badge = document.getElementById('sync-badge');
+  const icon = document.getElementById('sync-icon');
+  const txt = document.getElementById('sync-txt');
+  badge.className = 'sync-badge ' + state;
+  if (state === 'syncing') { icon.textContent = '↻'; txt.textContent = 'Syncing'; }
+  else if (state === 'synced') { icon.textContent = '✓'; txt.textContent = 'Synced'; }
+  else if (state === 'error') { icon.textContent = '✕'; txt.textContent = 'Error'; }
+  else { icon.textContent = '◯'; txt.textContent = 'GitHub'; }
+}
+
+// ══════════════════════════════════════
+// API CALLS
+// ══════════════════════════════════════
+function getApiConfig() {
+  return {
+    endpoint: cfg.get('api_endpoint', '').replace(/\/$/, ''),
+    apiKey: cfg.get('api_key', ''),
+    model: currentModel || cfg.get('default_model', ''),
+  };
+}
+
+function updateApiStatus() {
+  const { endpoint, apiKey } = getApiConfig();
+  const pill = document.getElementById('api-status-pill');
+  const pulse = document.getElementById('api-pulse');
+  const txt = document.getElementById('api-status-txt');
+  if (endpoint && apiKey) {
+    pill.className = 'api-status ok';
+    pulse.className = 'pulse';
+    const domain = endpoint.replace('https://','').replace('http://','').split('/')[0];
+    txt.textContent = domain;
+  } else {
+    pill.className = 'api-status err';
+    pulse.className = 'pulse err';
+    txt.textContent = endpoint ? '缺少 API Key' : '未配置 API';
+  }
+}
+
+async function testApi() {
+  const { endpoint, apiKey, model } = getApiConfig();
+  const resultEl = document.getElementById('api-test-result');
+  if (!endpoint || !apiKey) {
+    resultEl.innerHTML = '<span class="status-tag err">请先填写 Endpoint 和 API Key</span>';
+    return;
+  }
+  resultEl.innerHTML = '<span class="status-tag neutral">Testing...</span>';
+  try {
+    const res = await fetch(endpoint + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
+      body: JSON.stringify({ model: model || 'gpt-3.5-turbo', messages: [{ role: 'user', content: 'Hi' }], max_tokens: 5 }),
+    });
+    if (res.ok) {
+      resultEl.innerHTML = '<span class="status-tag ok">✓ 连接成功 · ' + res.status + '</span>';
+      updateApiStatus();
+    } else {
+      const t = await res.text();
+      resultEl.innerHTML = `<span class="status-tag err">✕ ${res.status} — ${t.slice(0,80)}</span>`;
+    }
+  } catch (e) {
+    resultEl.innerHTML = `<span class="status-tag err">✕ ${e.message}</span>`;
+  }
+}
+
+async function testGithub() {
+  const token = document.getElementById('cfg-gh-token').value.trim() || cfg.get('github_token');
+  const resultEl = document.getElementById('gh-test-result');
+  if (!token) { resultEl.innerHTML = '<span class="status-tag err">请输入 Token</span>'; return; }
+  resultEl.innerHTML = '<span class="status-tag neutral">Testing...</span>';
+  try {
+    const res = await fetch('https://api.github.com/user', { headers: { Authorization: 'token ' + token } });
+    if (res.ok) {
+      const j = await res.json();
+      resultEl.innerHTML = `<span class="status-tag ok">✓ 已连接 @${j.login}</span>`;
+      cfg.set('github_token', token);
+    } else {
+      resultEl.innerHTML = `<span class="status-tag err">✕ ${res.status}</span>`;
+    }
+  } catch (e) {
+    resultEl.innerHTML = `<span class="status-tag err">✕ ${e.message}</span>`;
+  }
+}
+
+async function callAPIStream(messages, onChunk, onDone, onError) {
+  const { endpoint, apiKey, model } = getApiConfig();
+  if (!endpoint || !apiKey) {
+    showToast('请先在 Settings 配置 API Endpoint 和 Key');
+    onError('未配置 API');
+    return;
+  }
+  if (!model) {
+    showToast('请在 Settings 配置模型名称');
+    onError('未配置模型');
+    return;
+  }
+  try {
+    const res = await fetch(endpoint + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
+      body: JSON.stringify({ model, messages, stream: true }),
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(res.status + ': ' + t.slice(0, 120));
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const j = JSON.parse(data);
+          const delta = j.choices?.[0]?.delta?.content ?? '';
+          if (delta) { full += delta; onChunk(full, delta); }
+          // accumulate usage if available
+          if (j.usage?.total_tokens) totalTokens += j.usage.total_tokens;
+        } catch {}
+      }
+    }
+    onDone(full);
+  } catch (e) {
+    onError(e.message);
+  }
+}
+
+// non-streaming fallback
+async function callAPI(messages) {
+  const { endpoint, apiKey, model } = getApiConfig();
+  const res = await fetch(endpoint + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
+    body: JSON.stringify({ model, messages }),
+  });
+  const j = await res.json();
+  return j.choices?.[0]?.message?.content ?? '';
+}
+
+// ══════════════════════════════════════
+// CHAT UI
+// ══════════════════════════════════════
+function renderAgentSidebar() {
+  const scroll = document.getElementById('agents-scroll');
+  scroll.innerHTML = '';
+  const teams = ['master', 'dev', 'research', 'ops'];
+  for (const team of teams) {
+    const teamAgents = agents.filter(a => a.team === team);
+    if (!teamAgents.length) continue;
+    const tc = TEAM_COLORS[team] || TEAM_COLORS.dev;
+    if (team !== 'master') {
+      const th = document.createElement('div');
+      th.className = 'team-header';
+      th.innerHTML = `<div class="team-stripe" style="background:${tc.color}"></div><div class="team-label" style="color:${tc.color}">${team.toUpperCase()}</div>`;
+      scroll.appendChild(th);
+    }
+    for (const ag of teamAgents) {
+      const el = document.createElement('div');
+      if (team === 'master') {
+        el.className = 'master-sidebar-item' + (ag.id === currentAgentId ? ' active' : '');
+        el.innerHTML = `
+          <div class="master-crown-tag">MASTER</div>
+          <div class="master-avatar">${ag.init}<div class="av-status" style="background:${tc.color};box-shadow:0 0 5px ${tc.color}"></div></div>
+          <div class="master-info"><div class="master-info-name">${ag.name}</div><div class="master-info-sub">${ag.role}</div></div>`;
+      } else {
+        el.className = 'agent-row' + (ag.id === currentAgentId ? ' active' : '');
+        el.style.borderLeftColor = tc.color;
+        el.innerHTML = `
+          <div class="agent-avatar" style="background:rgba(${tc.rgb},.12);color:${tc.color}">${ag.init}<div class="av-status" style="background:${tc.color}"></div></div>
+          <div class="agent-info"><div class="agent-name-row"><div class="agent-name">${ag.name}</div></div><div class="agent-task-preview">${ag.role}</div></div>`;
+      }
+      el.onclick = () => { selectAgent(ag.id); closeMobileSidebar(); };
+      scroll.appendChild(el);
+    }
+  }
+}
+
+function selectAgent(agentId) {
+  currentAgentId = agentId;
+  const ag = agents.find(a => a.id === agentId);
+  if (!ag) return;
+  const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
+
+  // update header
+  const hdrAv = document.getElementById('hdr-av');
+  hdrAv.textContent = ag.init;
+  hdrAv.style.cssText = ag.team === 'master'
+    ? 'background:rgba(200,240,96,.12);border:1px solid rgba(200,240,96,.25);color:var(--accent);font-size:15px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center'
+    : `background:rgba(${tc.rgb},.12);color:${tc.color};width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600`;
+  document.getElementById('hdr-name').textContent = ag.name;
+  document.getElementById('hdr-role').textContent = ag.role;
+  document.getElementById('send-btn').style.background = tc.color;
+  document.getElementById('chat-ta').placeholder = `发消息给 ${ag.name}...`;
+
+  // model
+  currentModel = cfg.get('default_model', '');
+  document.getElementById('hdr-model').textContent = currentModel || '—';
+  renderModelDropdown();
+
+  // update tokens display
+  updateTokensDisplay();
+
+  // render this agent's conversation
+  renderMessages(agentId);
+
+  // sidebar active state
+  renderAgentSidebar();
+}
+
+function renderMessages(agentId) {
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML = '';
+  const conv = getConversation(agentId);
+  if (!conv.length) {
+    // welcome note
+    const ag = agents.find(a => a.id === agentId);
+    const note = document.createElement('div');
+    note.className = 'system-note';
+    note.textContent = ag ? `与 ${ag.name} 的新对话 · ${new Date().toLocaleDateString('zh')}` : '新对话';
+    msgs.appendChild(note);
+    return;
+  }
+  const today = new Date().toLocaleDateString('zh', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
+  const sep = document.createElement('div');
+  sep.className = 'date-sep';
+  sep.innerHTML = `<div class="date-line"></div><div class="date-lbl">TODAY · ${today}</div><div class="date-line"></div>`;
+  msgs.appendChild(sep);
+
+  for (const msg of conv) {
+    appendMessage(msg.role, msg.content, msg.time, false);
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendMessage(role, content, time, scroll = true) {
+  const msgs = document.getElementById('chat-msgs');
+  const ag = agents.find(a => a.id === currentAgentId);
+  const tc = ag ? (TEAM_COLORS[ag.team] || TEAM_COLORS.dev) : TEAM_COLORS.master;
+  const t = time || new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
+  const g = document.createElement('div');
+  g.className = 'msg-group from-' + role;
+
+  if (role === 'user') {
+    g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="background:rgba(255,255,255,.06);color:var(--text2)">你</div><div class="msg-time">${t}</div></div><div class="bubble from-user"></div>`;
+    g.querySelector('.bubble').textContent = content;
+  } else {
+    const avS = ag?.team === 'master'
+      ? 'background:rgba(200,240,96,.1);color:var(--accent)'
+      : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
+    g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag?.init || 'AI'}</div><div class="msg-sender">${ag?.name || 'AI'}</div><div class="msg-time">${t}</div></div><div class="bubble from-agent"></div>`;
+    // render markdown-light
+    g.querySelector('.bubble').innerHTML = renderMd(content);
+  }
+  msgs.appendChild(g);
+  if (scroll) msgs.scrollTop = msgs.scrollHeight;
+  return g;
+}
+
+// very simple markdown: bold, code, code blocks
+function renderMd(text) {
+  text = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre>${code}</pre>`)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+  return text;
+}
+
+function showTypingIndicator() {
+  const msgs = document.getElementById('chat-msgs');
+  const ag = agents.find(a => a.id === currentAgentId);
+  const tc = ag ? (TEAM_COLORS[ag.team] || TEAM_COLORS.dev) : TEAM_COLORS.master;
+  const avS = ag?.team === 'master'
+    ? 'background:rgba(200,240,96,.1);color:var(--accent)'
+    : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
+  const g = document.createElement('div');
+  g.className = 'msg-group from-agent';
+  g.id = 'typing-indicator';
+  g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag?.init || 'AI'}</div><div class="msg-sender">${ag?.name || 'AI'}</div></div><div class="typing-bub"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
+  msgs.appendChild(g);
+  msgs.scrollTop = msgs.scrollHeight;
+  return g;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMsg() {
+  if (isSending) return;
+  if (!currentAgentId) { showToast('请先选择一个 Agent'); return; }
+  const ta = document.getElementById('chat-ta');
+  const text = ta.value.trim();
+  if (!text) return;
+
+  const ag = agents.find(a => a.id === currentAgentId);
+  const now = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
+  const conv = getConversation(currentAgentId);
+
+  // add user message
+  conv.push({ role: 'user', content: text, time: now });
+  appendMessage('user', text, now);
+  ta.value = ''; ta.style.height = 'auto';
+
+  // disable send
+  isSending = true;
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+
+  // build messages for API (system + history)
+  const apiMessages = [
+    { role: 'system', content: ag.system },
+    ...conv.slice(-20).map(m => ({ role: m.role, content: m.content })), // last 20 turns
+  ];
+
+  // remove last item (just added) since we'll append assistant response
+  // actually we want to send user msg, so keep it
+  // typing indicator
+  const typingEl = showTypingIndicator();
+
+  // build streaming response bubble
+  let responseBubble = null;
+  let responseGroup = null;
+  const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
+  const avS = ag.team === 'master'
+    ? 'background:rgba(200,240,96,.1);color:var(--accent)'
+    : `background:rgba(${tc.rgb},.12);color:${tc.color}`;
+  const respNow = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
+
+  callAPIStream(
+    apiMessages,
+    (full, delta) => {
+      // first chunk: replace typing indicator with real bubble
+      if (!responseBubble) {
+        removeTypingIndicator();
+        const g = document.createElement('div');
+        g.className = 'msg-group from-agent';
+        g.innerHTML = `<div class="msg-meta"><div class="msg-av" style="${avS}">${ag.init}</div><div class="msg-sender">${ag.name}</div><div class="msg-time">${respNow}</div></div><div class="bubble from-agent streaming-cursor"></div>`;
+        document.getElementById('chat-msgs').appendChild(g);
+        responseBubble = g.querySelector('.bubble');
+        responseGroup = g;
+        document.getElementById('chat-msgs').scrollTop = 999999;
+      }
+      responseBubble.innerHTML = renderMd(full);
+      document.getElementById('chat-msgs').scrollTop = 999999;
+    },
+    (full) => {
+      // done
+      if (responseBubble) responseBubble.classList.remove('streaming-cursor');
+      conv.push({ role: 'assistant', content: full, time: respNow });
+      isSending = false;
+      btn.disabled = false;
+      updateTokensDisplay();
+    },
+    (err) => {
+      removeTypingIndicator();
+      if (responseBubble) { responseBubble.classList.remove('streaming-cursor'); }
+      // show error
+      const errEl = document.createElement('div');
+      errEl.className = 'system-note';
+      errEl.style.color = 'var(--research)';
+      errEl.style.borderColor = 'rgba(240,96,128,.2)';
+      errEl.textContent = '✕ API 错误: ' + err;
+      document.getElementById('chat-msgs').appendChild(errEl);
+      // remove last user msg from conv on error? keep it for retry
+      isSending = false;
+      btn.disabled = false;
+    }
+  );
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+}
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+
+function clearCurrentChat() {
+  if (!currentAgentId) return;
+  if (!confirm('清空与该 Agent 的对话历史？')) return;
+  conversations[currentAgentId] = [];
+  renderMessages(currentAgentId);
+}
+
+function updateTokensDisplay() {
+  document.getElementById('hdr-tokens').textContent = totalTokens > 0 ? totalTokens + ' tokens' : '—';
+}
+
+function filterAgents(q) {
+  const rows = document.querySelectorAll('#agents-scroll .agent-row, #agents-scroll .master-sidebar-item');
+  rows.forEach(r => {
+    const name = r.querySelector('.agent-name, .master-info-name')?.textContent.toLowerCase() || '';
+    r.style.display = (!q || name.includes(q.toLowerCase())) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════
+// MODEL DROPDOWN
+// ══════════════════════════════════════
+function renderModelDropdown() {
+  const dd = document.getElementById('model-dd');
+  const defaultM = cfg.get('default_model', '');
+  const extraStr = cfg.get('models_extra', '');
+  const extra = extraStr ? extraStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const allModels = defaultM ? [defaultM, ...extra.filter(m => m !== defaultM)] : extra;
+
+  if (!allModels.length) {
+    dd.innerHTML = '<div style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--text3)">在 Settings 中配置模型</div>';
+    return;
+  }
+  if (!currentModel && defaultM) currentModel = defaultM;
+  dd.innerHTML = allModels.map(m => `
+    <div class="model-opt ${m === currentModel ? 'selected' : ''}" onclick="setModelChoice('${m}',event)">
+      ${m === currentModel ? '<span class="model-chk">✓</span>' : ''}
+      <div class="model-opt-name">${m}</div>
+    </div>`).join('');
+}
+
+function toggleMDD(e) {
+  e.stopPropagation();
+  document.getElementById('model-dd').classList.toggle('open');
+}
+function setModelChoice(name, e) {
+  e.stopPropagation();
+  currentModel = name;
+  document.getElementById('hdr-model').textContent = name;
+  renderModelDropdown();
+  document.getElementById('model-dd').classList.remove('open');
+}
+document.addEventListener('click', () => document.getElementById('model-dd')?.classList.remove('open'));
+
+// ══════════════════════════════════════
+// TASKS
+// ══════════════════════════════════════
+const TEAM_TAG = { master:'tag-master', dev:'tag-dev', research:'tag-research', ops:'tag-ops' };
+const TEAM_LABEL = { master:'Master', dev:'Dev', research:'Research', ops:'Ops' };
+const PRIORITY_COLORS = { low:'var(--text3)', mid:'var(--dev)', high:'var(--ops)', urgent:'var(--research)' };
+
+function tbRender() {
+  const cols = { todo: [], progress: [], review: [], done: [] };
+  for (const t of taskData) {
+    if (tbFilterTeam !== 'all' && t.team !== tbFilterTeam) continue;
+    if (cols[t.col]) cols[t.col].push(t);
+  }
+
+  for (const [colId, tasks] of Object.entries(cols)) {
+    const body = document.getElementById('body-' + colId);
+    const cnt = document.getElementById('cnt-' + colId);
+    if (!body) continue;
+    cnt.textContent = tasks.length;
+    body.innerHTML = '';
+    for (const t of tasks) body.appendChild(renderTaskCard(t, colId));
+  }
+
+  const total = taskData.length;
+  const inProg = taskData.filter(t => t.col === 'progress').length;
+  document.getElementById('tb-meta').textContent = `${total} tasks · ${inProg} in progress`;
+}
+
+function renderTaskCard(t, col) {
+  const card = document.createElement('div');
+  card.className = 'task-card';
+  const tagCls = TEAM_TAG[t.team] || 'tag-dev';
+  const pColor = PRIORITY_COLORS[t.priority] || 'var(--text3)';
+
+  let extra = '';
+  if (col === 'progress' && t.progress > 0) {
+    extra = `<div class="card-progress"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Progress</span><span style="font-family:var(--mono);font-size:9px;color:var(--accent)">${Math.round(t.progress)}%</span></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${t.progress}%"></div></div></div>`;
+  }
+  if (col === 'review' && t.result) {
+    extra += `<div class="card-result">${t.result}</div>`;
+  }
+
+  // action buttons
+  let actions = '';
+  if (col === 'todo') actions = `<button class="card-btn primary" onclick="moveTask(${t.id},'progress');event.stopPropagation()">▶ 开始</button><button class="card-btn" onclick="deleteTask(${t.id});event.stopPropagation()">删除</button>`;
+  if (col === 'progress') actions = `<button class="card-btn" onclick="moveTask(${t.id},'review');event.stopPropagation()">→ Review</button>`;
+  if (col === 'review') actions = `<button class="card-btn primary" onclick="moveTask(${t.id},'done');event.stopPropagation()">✓ Done</button><button class="card-btn" onclick="moveTask(${t.id},'progress');event.stopPropagation()">← 返回</button>`;
+  if (col === 'done') actions = `<button class="card-btn" onclick="deleteTask(${t.id});event.stopPropagation()">归档删除</button>`;
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">${escHtml(t.title)}</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${pColor};flex-shrink:0;margin-top:4px"></div>
+    </div>
+    <div class="card-meta">
+      <span class="card-tag ${tagCls}">${TEAM_LABEL[t.team] || t.team}</span>
+      ${t.desc ? `<span style="font-size:10px;color:var(--text3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:120px">${escHtml(t.desc.slice(0,40))}</span>` : ''}
+      <span class="card-time">${t.createdAt || ''}</span>
+    </div>
+    ${extra}
+    <div class="card-actions">${actions}</div>`;
+  return card;
+}
+
+function moveTask(id, toCol) {
+  const t = taskData.find(x => x.id === id);
+  if (!t) return;
+  t.col = toCol;
+  if (toCol === 'progress' && !t.progress) t.progress = 0;
+  if (toCol === 'review' && !t.result) t.result = `任务已完成，请审阅。`;
+  saveTasksToLocal();
+  scheduleSave();
+  tbRender();
+  showToast(`已移动到 ${toCol === 'progress' ? 'In Progress' : toCol === 'review' ? 'Review' : 'Done'}`);
+}
+
+function deleteTask(id) {
+  taskData = taskData.filter(x => x.id !== id);
+  saveTasksToLocal();
+  scheduleSave();
+  tbRender();
+}
+
+function tbFilter(team, btn) {
+  tbFilterTeam = team;
+  document.querySelectorAll('#tb-filters .rf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tbRender();
+}
+
+// New task modal
+function openNewTaskModal() {
+  ntTeam = 'dev';
+  document.getElementById('nt-title').value = '';
+  document.getElementById('nt-desc').value = '';
+  renderNtTeamGrid();
+  document.getElementById('new-task-modal').classList.add('open');
+  setTimeout(() => document.getElementById('nt-title').focus(), 100);
+}
+function closeNewTaskModal() {
+  document.getElementById('new-task-modal').classList.remove('open');
+}
+
+function renderNtTeamGrid() {
+  const grid = document.getElementById('nt-team-grid');
+  const teams = [
+    { id: 'dev', label: 'Dev Team' },
+    { id: 'research', label: 'Research' },
+    { id: 'ops', label: 'Ops' },
+    { id: 'master', label: 'Master' },
+  ];
+  grid.innerHTML = teams.map(({ id, label }) => {
+    const tc = TEAM_COLORS[id] || TEAM_COLORS.dev;
+    const sel = id === ntTeam;
+    return `<div class="team-opt ${sel ? 'selected' : ''}" data-team="${id}"
+      style="${sel ? `border-color:${tc.color};background:rgba(${tc.rgb},.04)` : ''}"
+      onclick="selectNtTeam('${id}')">
+      <div style="width:8px;height:8px;border-radius:50%;background:${tc.color};flex-shrink:0"></div>
+      <div style="font-size:12px;font-weight:500">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectNtTeam(id) {
+  ntTeam = id;
+  renderNtTeamGrid();
+}
+
+function createTask() {
+  const title = document.getElementById('nt-title').value.trim();
+  if (!title) { document.getElementById('nt-title').focus(); return; }
+  const desc = document.getElementById('nt-desc').value.trim();
+  const id = Date.now();
+  const now = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' });
+  taskData.unshift({ id, col: 'todo', title, desc, team: ntTeam, priority: 'mid', progress: 0, createdAt: now, result: null });
+  saveTasksToLocal();
+  scheduleSave();
+  closeNewTaskModal();
+  tbRender();
+  showToast('任务已创建');
+}
+
+// ══════════════════════════════════════
+// AGENT CONFIG (settings page)
+// ══════════════════════════════════════
+function renderAgentsConfig() {
+  const el = document.getElementById('agents-config-list');
+  if (!el) return;
+  el.innerHTML = agents.map((ag, i) => {
+    const tc = TEAM_COLORS[ag.team] || TEAM_COLORS.dev;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(${tc.rgb},.12);color:${tc.color};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;flex-shrink:0">${ag.init}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${escHtml(ag.name)}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${ag.role} · ${ag.team}</div>
+      </div>
+      <button class="settings-btn secondary" onclick="editAgent(${i})" style="padding:5px 12px;font-size:10px">Edit</button>
+      ${agents.length > 1 ? `<button class="settings-btn secondary" onclick="removeAgent(${i})" style="padding:5px 12px;font-size:10px;color:var(--research)">Del</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function removeAgent(i) {
+  if (!confirm(`删除 ${agents[i].name}？`)) return;
+  const id = agents[i].id;
+  agents.splice(i, 1);
+  saveAgents();
+  if (currentAgentId === id) {
+    currentAgentId = agents[0]?.id;
+    selectAgent(currentAgentId);
+  }
+  renderAgentsConfig();
+  renderAgentSidebar();
+}
+
+let editingAgentIdx = -1;
+function editAgent(i) {
+  editingAgentIdx = i;
+  const ag = agents[i];
+  document.getElementById('aa-name').value = ag.name;
+  document.getElementById('aa-role').value = ag.role;
+  document.getElementById('aa-team').value = ag.team;
+  document.getElementById('aa-system').value = ag.system;
+  document.getElementById('add-agent-modal').classList.add('open');
+}
+
+function openAddAgentModal() {
+  editingAgentIdx = -1;
+  document.getElementById('aa-name').value = '';
+  document.getElementById('aa-role').value = '';
+  document.getElementById('aa-team').value = 'dev';
+  document.getElementById('aa-system').value = '';
+  document.getElementById('add-agent-modal').classList.add('open');
+}
+function closeAddAgentModal() { document.getElementById('add-agent-modal').classList.remove('open'); }
+
+function addAgent() {
+  const name = document.getElementById('aa-name').value.trim();
+  if (!name) return;
+  const role = document.getElementById('aa-role').value.trim() || 'AI Assistant';
+  const team = document.getElementById('aa-team').value;
+  const system = document.getElementById('aa-system').value.trim() || 'You are a helpful AI assistant.';
+  const init = name.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  if (editingAgentIdx >= 0) {
+    const ag = agents[editingAgentIdx];
+    ag.name = name; ag.role = role; ag.team = team; ag.system = system;
+    ag.init = init;
+    showToast(`${name} 已更新`);
+  } else {
+    const id = 'agent_' + Date.now();
+    agents.push({ id, name, role, team, init, system });
+    showToast(`${name} 已添加`);
+  }
+  saveAgents();
+  closeAddAgentModal();
+  renderAgentSidebar();
+  renderAgentsConfig();
+}
+
+// ══════════════════════════════════════
+// SETTINGS & THEME
+// ══════════════════════════════════════
+function loadSettingsUI() {
+  document.getElementById('cfg-endpoint').value = cfg.get('api_endpoint', '');
+  document.getElementById('cfg-apikey').value = cfg.get('api_key', '');
+  document.getElementById('cfg-model').value = cfg.get('default_model', '');
+  document.getElementById('cfg-models-extra').value = cfg.get('models_extra', '');
+  document.getElementById('cfg-gh-token').value = cfg.get('github_token', '');
+  document.getElementById('cfg-gist-id').value = cfg.get('gist_id', '');
+  autoSync = cfg.get('autosync', 'on') === 'on';
+  document.getElementById('toggle-autosync').classList.toggle('on', autoSync);
+
+  const light = cfg.get('theme', 'dark') === 'light';
+  document.body.classList.toggle('light', light);
+  document.getElementById('toggle-theme').classList.toggle('on', light);
+  updateApiStatus();
+  renderModelDropdown();
+  renderAgentsConfig();
+}
+
+function toggleAutoSync(el) {
+  el.classList.toggle('on');
+  autoSync = el.classList.contains('on');
+  cfg.set('autosync', autoSync ? 'on' : 'off');
+}
+
+function toggleTheme(el) {
+  el.classList.toggle('on');
+  const light = el.classList.contains('on');
+  document.body.classList.toggle('light', light);
+  cfg.set('theme', light ? 'light' : 'dark');
+}
+
+// ══════════════════════════════════════
+// MOBILE SIDEBAR
+// ══════════════════════════════════════
+function toggleMobileSidebar() {
+  const sidebar = document.querySelector('.agent-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+  else { sidebar.classList.add('open'); overlay.classList.add('open'); }
+}
+function closeMobileSidebar() {
+  document.querySelector('.agent-sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('open');
+}
+
+// ══════════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════════
+let currentPage = 'chat';
+function showPage(id, btn) {
+  currentPage = id;
+  // hide all
+  ['chat', 'tasks', 'settings'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+  });
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(t => t.classList.remove('active'));
+
+  if (id === 'chat') {
+    const el = document.getElementById('page-chat');
+    el.style.display = 'flex'; el.classList.add('active');
+    // show mobile menu button only on chat page
+    document.getElementById('mob-menu-btn').style.display = '';
+  } else if (id === 'tasks') {
+    const el = document.getElementById('page-tasks');
+    el.style.display = 'flex'; el.style.flexDirection = 'column'; el.classList.add('active');
+    document.getElementById('mob-menu-btn').style.display = 'none';
+    tbRender();
+  } else if (id === 'settings') {
+    const el = document.getElementById('page-settings');
+    el.style.display = 'block'; el.classList.add('active');
+    document.getElementById('mob-menu-btn').style.display = 'none';
+    loadSettingsUI();
+  }
+
+  // activate desktop nav tab
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if (t.getAttribute('onclick')?.includes("'" + id + "'")) t.classList.add('active');
+  });
+  // activate mobile bottom nav
+  const bnavEl = document.getElementById('bnav-' + id);
+  if (bnavEl) bnavEl.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+loadAgents();
+loadTasksFromLocal();
+updateApiStatus();
+
+// select first agent
+if (agents.length) {
+  currentAgentId = agents[0].id;
+  currentModel = cfg.get('default_model', '');
+}
+
+// apply saved theme
+const savedTheme = cfg.get('theme', 'dark');
+if (savedTheme === 'light') document.body.classList.add('light');
+
+// render sidebar
+renderAgentSidebar();
+
+// render initial chat
+if (currentAgentId) {
+  selectAgent(currentAgentId);
+}
+
+// init tasks render
+tbRender();
+
+// try load from gist on startup (silent)
+if (cfg.get('github_token') && cfg.get('gist_id')) {
+  loadFromGist(false);
+}
+
+// render model dropdown
+renderModelDropdown();
+
+</script>
+</body>
+</html>
